@@ -1694,7 +1694,7 @@ void MovableMan::Update() {
 
 	// Sort team rosters if necessary
 	for (int team = Activity::TeamOne; team < Activity::MaxTeamCount; ++team) {
-		if (m_SortTeamRoster[Activity::TeamOne]) {
+		if (m_SortTeamRoster[team]) {
 			m_ActorRoster[team].sort(MOXPosComparison());
 		}
 	}
