@@ -270,6 +270,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fixed a couple of uninitialized values (Atom step state and the simulation frame counter) that could cause inconsistent behavior between runs.
 
+- Fixed Lua scripts having unrestricted system access through the `io`, `os` and `ffi` libraries and native module loading. These are now only available when `EnableLuaDebugging` is set; otherwise `os` is limited to `clock`, `date`, `difftime` and `time`. Use `LuaMan:FileOpen` and friends for file access.
+
+- Fixed the game aborting when reverting to the previous resolution after a failed resolution change, even when the revert succeeded.
+
+- Fixed world dumps producing a garbled image, and screen and world dumps reporting success and failure the wrong way around. Screen dumps also no longer leak a copy of the screen each time.
+
+- Fixed team rosters of teams other than team one never being re-sorted when requested.
+
+- Fixed a possible abort on launch or during play when two timer updates happened within the same microsecond.
+
 </details>
 
 <details><summary><b>Removed</b></summary>
