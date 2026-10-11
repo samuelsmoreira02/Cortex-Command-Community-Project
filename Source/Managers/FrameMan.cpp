@@ -551,12 +551,12 @@ int FrameMan::SaveBitmap(SaveBitmapMode modeToSave, const std::string& nameBase,
 				SDL_Surface* saveSurface = SDL_ConvertSurface(m_ScreenDumpBuffer.get(), m_ScreenDumpBuffer->format);
 				auto saveScreenDump = [fullFileName](SDL_Surface* bitmapToSaveCopy) {
 					// nullptr for the PALETTE parameter here because we're saving a 24bpp file and it's irrelevant.
-					if (IMG_SavePNG(bitmapToSaveCopy, fullFileName.c_str()) == 0) {
+					if (IMG_SavePNG(bitmapToSaveCopy, fullFileName.c_str())) {
 						g_ConsoleMan.PrintString("SYSTEM: Screen was dumped to: " + fullFileName);
 					} else {
 						g_ConsoleMan.PrintString("ERROR: Unable to save bitmap to: " + fullFileName);
 					}
-					// SDL_FreeSurface(bitmapToSaveCopy);
+					SDL_DestroySurface(bitmapToSaveCopy);
 				};
 				std::thread saveThread(saveScreenDump, saveSurface);
 				saveThread.detach();
@@ -591,9 +591,9 @@ int FrameMan::SaveBitmap(SaveBitmapMode modeToSave, const std::string& nameBase,
 				    depthConvertBitmap->h,
 				    SDL_PIXELFORMAT_RGB24,
 				    depthConvertBitmap->dat,
-				    3);
+				    depthConvertBitmap->w * 3);
 
-				if (IMG_SavePNG(saveSurface, fullFileName.c_str()) == 0) {
+				if (IMG_SavePNG(saveSurface, fullFileName.c_str())) {
 					g_ConsoleMan.PrintString("SYSTEM: World was dumped to: " + fullFileName);
 					saveSuccess = true;
 				}

@@ -480,7 +480,7 @@ void WindowMan::AttemptToRevertToPreviousResolution(bool revertToDefaults) {
 		SDL_SetWindowPosition(m_PrimaryWindow.get(), SDL_WINDOWPOS_CENTERED_DISPLAY(m_PrimaryWindowDisplayIndex), SDL_WINDOWPOS_CENTERED_DISPLAY(m_PrimaryWindowDisplayIndex));
 	}
 
-	bool result = SDL_SetWindowFullscreen(m_PrimaryWindow.get(), fullscreen) == 0;
+	bool result = SDL_SetWindowFullscreen(m_PrimaryWindow.get(), fullscreen);
 	if (!result && !revertToDefaults) {
 		RTEError::ShowMessageBox("Failed to revert to previous resolution settings!\nAttempting to revert to defaults!");
 		setDefaultResSettings();
