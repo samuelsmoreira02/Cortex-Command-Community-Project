@@ -83,7 +83,8 @@ void TimerMan::Update() {
 	// Cap timeIncrease if too long (as when the app went out of focus), to c_RealToSimCap.
 	long long timeIncrease = std::min(m_RealTimeTicks - prevTime, static_cast<long long>(c_RealToSimCap * m_TicksPerSecond));
 
-	RTEAssert(timeIncrease > 0, "It seems your CPU is giving bad timing data to the game, this is known to happen on some multi-core processors. This may be fixed by downloading the latest CPU drivers from AMD or Intel.");
+	// steady_clock is monotonic but only has microsecond resolution here, so two updates within the same microsecond legitimately give 0.
+	RTEAssert(timeIncrease >= 0, "It seems your CPU is giving bad timing data to the game, this is known to happen on some multi-core processors. This may be fixed by downloading the latest CPU drivers from AMD or Intel.");
 
 	// If not paused, add the new time difference to the sim accumulator
 	if (!m_SimPaused) {
