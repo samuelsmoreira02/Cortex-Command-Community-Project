@@ -45,7 +45,7 @@ void LuaStateWrapper::Initialize() {
 	    {LUA_MATHLIBNAME, luaopen_math},
 	    {LUA_DBLIBNAME, luaopen_debug},
 
-		// These were removed for "security reasons" but we need them for debugger integration
+		// These give scripts unrestricted access to the system, so they're only loaded when the debugger integration needs them. "os" is restricted to its time functions below otherwise.
 	    {LUA_IOLIBNAME, luaopen_io},
 	    {LUA_OSLIBNAME, luaopen_os},
 
@@ -57,8 +57,12 @@ void LuaStateWrapper::Initialize() {
 	    {NULL, NULL} // End of array
 	};
 
+	const bool luaDebuggingEnabled = g_SettingsMan.EnableLuaDebugging();
 	for (const luaL_Reg* lib = libsToLoad; lib->func; lib++) {
 		if (g_SettingsMan.DisableLuaJIT() && strcmp(lib->name, LUA_JITLIBNAME) == 0) {
+			continue;
+		}
+		if (!luaDebuggingEnabled && (strcmp(lib->name, LUA_IOLIBNAME) == 0 || strcmp(lib->name, LUA_FFILIBNAME) == 0)) {
 			continue;
 		}
 		lua_pushcfunction(m_State, lib->func);
@@ -274,6 +278,13 @@ void LuaStateWrapper::Initialize() {
 
 	if (g_SettingsMan.EnableLuaDebugging()) {
 		luaL_dostring(m_State, "require(\"mobdebug\").coro(); require(\"mobdebug\").start();");
+	} else {
+		luaL_dostring(m_State,
+		              // Keep only the harmless time functions of "os", so mods can't run commands, delete files or read the environment.
+		              "do local SafeOS = { clock = os.clock, date = os.date, difftime = os.difftime, time = os.time }; os = SafeOS; package.loaded.os = SafeOS; end\n"
+		              // Stop "require" and "package.loadlib" from loading native libraries, which would bypass all of the above.
+		              "package.loadlib = nil; package.cpath = ''; package.loaded.ffi = nil; package.preload.ffi = nil;\n"
+		              "for i = #package.loaders, 3, -1 do table.remove(package.loaders, i); end\n");
 	}
 }
 
