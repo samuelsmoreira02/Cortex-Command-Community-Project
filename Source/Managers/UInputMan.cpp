@@ -88,8 +88,11 @@ int UInputMan::Initialize() {
 			SDL_SetGamepadPlayerIndex(controller, controllerIndex);
 			s_PrevJoystickStates[controllerIndex] = Gamepad(controllerIndex, joysticks[index], SDL_GAMEPAD_AXIS_COUNT, SDL_GAMEPAD_BUTTON_COUNT);
 			s_ChangedJoystickStates[controllerIndex] = Gamepad(controllerIndex, joysticks[index], SDL_GAMEPAD_AXIS_COUNT, SDL_GAMEPAD_BUTTON_COUNT);
+			// No player may be set to use this gamepad (e.g. more gamepads are connected than players configured for them).
 			auto playerScheme = std::find_if(m_ControlScheme.begin(), m_ControlScheme.end(), [controllerIndex](auto& scheme) { return scheme.GetDevice() == controllerIndex + InputDevice::DEVICE_GAMEPAD_1; });
-			playerScheme->SetDeviceID({.gamepad = joysticks[index]});
+			if (playerScheme != m_ControlScheme.end()) {
+				playerScheme->SetDeviceID({.gamepad = joysticks[index]});
+			}
 			controllerIndex++;
 			m_NumJoysticks++;
 		} else {
@@ -101,7 +104,9 @@ int UInputMan::Initialize() {
 			s_PrevJoystickStates[controllerIndex] = Gamepad(controllerIndex, joysticks[index], SDL_GetNumJoystickAxes(joy), SDL_GetNumJoystickButtons(joy));
 			s_ChangedJoystickStates[controllerIndex] = Gamepad(controllerIndex, joysticks[index], SDL_GetNumJoystickAxes(joy), SDL_GetNumJoystickButtons(joy));
 			auto playerScheme = std::find_if(m_ControlScheme.begin(), m_ControlScheme.end(), [controllerIndex](auto& scheme) { return scheme.GetDevice() == controllerIndex + InputDevice::DEVICE_GAMEPAD_1; });
-			playerScheme->SetDeviceID({.gamepad = joysticks[index]});
+			if (playerScheme != m_ControlScheme.end()) {
+				playerScheme->SetDeviceID({.gamepad = joysticks[index]});
+			}
 			controllerIndex++;
 			m_NumJoysticks++;
 		}
