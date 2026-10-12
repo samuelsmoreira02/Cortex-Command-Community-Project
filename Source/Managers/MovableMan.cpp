@@ -762,13 +762,18 @@ Actor* MovableMan::RemoveActor(MovableObject* pActorToRem) {
 	Actor* removed = nullptr;
 
 	if (pActorToRem) {
-		for (std::deque<Actor*>::iterator itr = m_Actors.begin(); itr != m_Actors.end(); ++itr) {
-			if (*itr == pActorToRem) {
-				std::lock_guard<std::mutex> lock(m_ActorsMutex);
-				removed = *itr;
-				m_ValidActors.erase(*itr);
-				m_Actors.erase(itr);
-				break;
+		// The previous update's seeing rays may still be running on other threads and indexing into m_Actors, so let them finish before erasing from it.
+		m_ActorsSeeFuture.wait();
+
+		{
+			std::lock_guard<std::mutex> lock(m_ActorsMutex);
+			for (std::deque<Actor*>::iterator itr = m_Actors.begin(); itr != m_Actors.end(); ++itr) {
+				if (*itr == pActorToRem) {
+					removed = *itr;
+					m_ValidActors.erase(*itr);
+					m_Actors.erase(itr);
+					break;
+				}
 			}
 		}
 		// Try the newly added actors if we couldn't find it in the regular deque
@@ -1036,6 +1041,11 @@ int MovableMan::KillAllEnemyActors(int teamNotToKill) const {
 
 int MovableMan::GetAllActors(bool transferOwnership, std::list<SceneObject*>& actorList, int onlyTeam, bool noBrains) {
 	int addedCount = 0;
+
+	if (transferOwnership) {
+		// Actors are deleted and the deque cleared below, so the previous update's seeing rays must not still be reading them.
+		m_ActorsSeeFuture.wait();
+	}
 
 	// Add all regular Actors
 	for (std::deque<Actor*>::iterator aIt = m_Actors.begin(); aIt != m_Actors.end(); ++aIt) {
