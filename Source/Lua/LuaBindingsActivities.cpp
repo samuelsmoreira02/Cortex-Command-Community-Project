@@ -93,7 +93,8 @@ LuaBindingRegisterFunctionDefinitionForType(ActivityLuaBindings, Activity) {
 	                        luabind::value("AIPATROLPOINTS", Activity::ViewState::AIPatrolPoints),
 	                        luabind::value("AIGOLDDIGPOINT", Activity::ViewState::AIGoldDigPoint),
 	                        luabind::value("AIGOTOPOINT", Activity::ViewState::AIGoToPoint),
-	                        luabind::value("LZSELECT", Activity::ViewState::LandingZoneSelect)]
+	                        luabind::value("LZSELECT", Activity::ViewState::LandingZoneSelect),
+	                        luabind::value("UNITSELECTCIRCLE", Activity::ViewState::UnitSelectCircle)]
 	    .enum_("DifficultySetting")[luabind::value("MINDIFFICULTY", Activity::DifficultySetting::MinDifficulty),
 	                                luabind::value("CAKEDIFFICULTY", Activity::DifficultySetting::CakeDifficulty),
 	                                luabind::value("EASYDIFFICULTY", Activity::DifficultySetting::EasyDifficulty),

@@ -1,6 +1,7 @@
 require("Constants")
 require("AI/CrabBehaviors");
 require("AI/SharedBehaviors");
+require("AI/TacticalSquad");
 
 NativeCrabAI = {};
 
@@ -147,15 +148,27 @@ function NativeCrabAI:Update(Owner)
 		self.lastAIMode = Owner.AIMode;
 	end
 
-	-- cast a ray to find targets
-	CrabBehaviors.LookForTargets(self, Owner);
+	if TacticalSquad.IsHoldingFire(Owner) then
+		-- ordered to hold fire, so don't look for targets, and forget the current one once it's been unseen for long enough, same as when it's lost from sight
+		if self.Target and self.TargetLostTimer:IsPastSimTimeLimit() then
+			self.Target = nil;
+			self:CreatePinBehavior(Owner);
+		end
+	else
+		-- cast a ray to find targets
+		CrabBehaviors.LookForTargets(self, Owner);
+	end
 
 	self.squadShoot = false;
 	if Owner.MOMoveTarget then
 		-- make the last waypoint marker stick to the MO we are following
 		if MovableMan:ValidMO(Owner.MOMoveTarget) then
 			Owner:RemoveMovePathEnd();
-			Owner:AddToMovePathEnd(Owner.MOMoveTarget.Pos);
+			if Owner.AIMode == Actor.AIMODE_SQUAD and IsActor(Owner.MOMoveTarget) then
+				Owner:AddToMovePathEnd(TacticalSquad.GetFollowPos(self, Owner, ToActor(Owner.MOMoveTarget)));
+			else
+				Owner:AddToMovePathEnd(Owner.MOMoveTarget.Pos);
+			end
 
 			if Owner.AIMode == Actor.AIMODE_SQUAD then
 				-- look where the SL looks, if not moving
@@ -171,7 +184,8 @@ function NativeCrabAI:Update(Owner)
 						end
 					end
 
-					if Leader and Leader.EquippedItem and IsHDFirearm(Leader.EquippedItem) and SceneMan:ShortestDistance(Owner.Pos, Leader.Pos, false).Largest < (Leader.Height + Owner.Height) * 0.5 then
+					-- in formation, being in our slot counts as being next to the leader
+					if Leader and Leader.EquippedItem and IsHDFirearm(Leader.EquippedItem) and SceneMan:ShortestDistance(Owner.Pos, TacticalSquad.GetFollowPos(self, Owner, Leader), false).Largest < (Leader.Height + Owner.Height) * 0.5 then
 						local LeaderWeapon = ToHDFirearm(Leader.EquippedItem);
 						if LeaderWeapon:IsWeapon() then
 							local AimDelta = SceneMan:ShortestDistance(Leader.Pos, Leader.ViewPoint, false);
@@ -244,6 +258,11 @@ function NativeCrabAI:Update(Owner)
 		Owner.AIMode = Actor.AIMODE_SENTRY;
 		Owner:ClearMovePath();
 	end]]
+
+	-- members holding fire don't join in when the leader shoots
+	if self.squadShoot and TacticalSquad.IsHoldingFire(Owner) then
+		self.squadShoot = false;
+	end
 
 	if self.squadShoot then
 		-- cycle semi-auto weapons on and off so the AI will shoot even if the player only press and hold the trigger
@@ -327,6 +346,10 @@ function NativeCrabAI:Update(Owner)
 			Owner:SendMessage("AI_IsFlying", newFlying);
 			self.flying = newFlying;
 		end
+	end
+
+	if TacticalSquad.IsHoldingFire(Owner) then
+		self.fire = false;
 	end
 
 	-- controller states

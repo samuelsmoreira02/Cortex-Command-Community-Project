@@ -1,6 +1,7 @@
 require("Constants")
 require("AI/HumanBehaviors");
 require("AI/SharedBehaviors");
+require("AI/TacticalSquad");
 
 NativeHumanAI = {};
 
@@ -270,8 +271,11 @@ function NativeHumanAI:Update(Owner)
 		Owner:EquipShieldInBGArm(); -- try to equip a shield
 	end
 
-	-- look for targets
-	local FoundMO, HitPoint = self.SpotTargets(self, Owner, self.skill);
+	-- look for targets, unless ordered to hold fire, in which case any current target is dropped once it's been unseen for long enough
+	local FoundMO, HitPoint;
+	if not TacticalSquad.IsHoldingFire(Owner) then
+		FoundMO, HitPoint = self.SpotTargets(self, Owner, self.skill);
+	end
 	if FoundMO then
 		--TODO: decide whether to attack based on the material strength of found MO
 		if self.Behavior ~= nil and self.Target and MovableMan:ValidMO(self.Target) and FoundMO.ID == self.Target.ID then	-- found the same target
@@ -350,7 +354,11 @@ function NativeHumanAI:Update(Owner)
 		-- make the last waypoint marker stick to the MO we are following
 		if MovableMan:ValidMO(Owner.MOMoveTarget) then
 			Owner:RemoveMovePathEnd();
-			Owner:AddToMovePathEnd(Owner.MOMoveTarget.Pos);
+			if Owner.AIMode == Actor.AIMODE_SQUAD and IsActor(Owner.MOMoveTarget) then
+				Owner:AddToMovePathEnd(TacticalSquad.GetFollowPos(self, Owner, ToActor(Owner.MOMoveTarget)));
+			else
+				Owner:AddToMovePathEnd(Owner.MOMoveTarget.Pos);
+			end
 
 			if Owner.AIMode == Actor.AIMODE_SQUAD then
 				-- look where the SL looks, if not moving
@@ -367,7 +375,8 @@ function NativeHumanAI:Update(Owner)
 					end
 
 					if Leader then
-						local dist = SceneMan:ShortestDistance(Owner.Pos, Leader.Pos, false).Largest;
+						-- in formation, being in our slot counts as being next to the leader
+						local dist = SceneMan:ShortestDistance(Owner.Pos, TacticalSquad.GetFollowPos(self, Owner, Leader), false).Largest;
 						local radius = (Leader.Height + Owner.Height) * 0.5;
 						if dist < radius then
 							local copyControls = {Controller.MOVE_LEFT, Controller.MOVE_RIGHT, Controller.BODY_JUMPSTART, Controller.BODY_JUMP, Controller.BODY_PRONE};
@@ -465,6 +474,11 @@ function NativeHumanAI:Update(Owner)
 		if self.GoToName == "GoToWpt" then
 			self:CreateGoToBehavior(Owner);
 		end
+	end
+
+	-- members holding fire don't join in when the leader shoots
+	if self.squadShoot and TacticalSquad.IsHoldingFire(Owner) then
+		self.squadShoot = false;
 	end
 
 	if self.squadShoot then
@@ -605,6 +619,10 @@ function NativeHumanAI:Update(Owner)
 		end
 	else
 		self.BlockedTimer:Reset();
+	end
+
+	if TacticalSquad.IsHoldingFire(Owner) then
+		self.fire = false;
 	end
 
 	-- controller states
