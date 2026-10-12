@@ -36,6 +36,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 	New `Material` INI properties `Flammability` (0 to 1, 0 by default, which never burns), `BurnTime` (in milliseconds, 3000 by default) and `BurnsInto` (the material index it turns into, air by default).  
 	New Lua functions `SceneMan:IgniteTerrain(pos, radius)`, `SceneMan:ExtinguishTerrain(pos, radius)` (both return how many pixels were affected) and `SceneMan:GetBurningTerrainPixelCount()`.
 
+- Structural collapse.  
+	Terrain that loses its connection to the ground now falls, instead of floating in midair. Whenever terrain is shot, blown up, dug, erased or burnt away, the terrain around it is checked, and pieces that no longer connect to the bottom of the scene (or its sides, if it doesn't wrap) come down. Tiny pieces crumble into loose particles. Bigger ones fall as rigid chunks that keep every pixel's material and color, crush the actors under them, and settle where they land with a rumble, a cloud of dust and some screen shake. Falling chunks are still terrain, so they can be shot and dug through on the way down. Only terrain around removed terrain is checked, and pieces bigger than 40000 pixels are considered supported, so this stays cheap.  
+	New `Settings.ini` property `StructuralCollapse` (true by default) to turn it off, also available as the Lua property `SceneMan.StructuralCollapse` (R/W), and new Lua function `SceneMan:GetFallingTerrainChunkCount()`.  
+	Burning terrain now stops burning when the burning pixel is blown away, instead of flickering in midair.
+
 - New Lua functions `SceneMan:SetNextProceduralTerrainSeed(seed)`, `SceneMan:GetLastProceduralTerrainSeed()`, `SceneMan:SetSceneToLoad(sceneName, placeObjects, placeUnits)`, `ActivityMan:SetRestartActivity(restart)`, `FrameMan:SaveWorldToPNG(nameBase)` and `FrameMan:SaveWorldPreviewToPNG(nameBase)`.
 
 - Pathfinding and navigation overhaul, including jetpack/jump-aware pathfinding.  
@@ -253,6 +258,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 </details>
 
 <details><summary><b>Fixed</b></summary>
+
+- Fixed `SceneMan:DislodgePixelBox()` dislodging a box twice as wide and twice as tall as the one asked for.
 
 - Fixed a crash on launch that could occur depending on what Microsoft Visual C++ Redistributable the user has installed.
 

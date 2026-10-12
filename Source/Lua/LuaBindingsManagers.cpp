@@ -313,6 +313,7 @@ LuaBindingRegisterFunctionDefinitionForType(ManagerLuaBindings, SceneMan) {
 	    .property("OzPerKg", &SceneMan::GetOzPerKg)
 	    .property("KgPerOz", &SceneMan::GetKgPerOz)
 	    .property("ScrapCompactingHeight", &SceneMan::GetScrapCompactingHeight, &SceneMan::SetScrapCompactingHeight)
+	    .property("StructuralCollapse", &SceneMan::GetStructuralCollapse, &SceneMan::SetStructuralCollapse)
 
 	    .def("LoadScene", (int(SceneMan::*)(const std::string&, bool, bool)) & SceneMan::LoadScene)
 	    .def("LoadScene", (int(SceneMan::*)(const std::string&, bool)) & SceneMan::LoadScene)
@@ -322,6 +323,7 @@ LuaBindingRegisterFunctionDefinitionForType(ManagerLuaBindings, SceneMan) {
 	    .def("IgniteTerrain", &SceneMan::IgniteTerrain)
 	    .def("ExtinguishTerrain", &SceneMan::ExtinguishTerrain)
 	    .def("GetBurningTerrainPixelCount", &SceneMan::GetBurningTerrainPixelCount)
+	    .def("GetFallingTerrainChunkCount", &SceneMan::GetFallingTerrainChunkCount)
 
 	    .def("GetTerrain", &SceneMan::GetTerrain)
 	    .def("GetMaterial", &SceneMan::GetMaterial)

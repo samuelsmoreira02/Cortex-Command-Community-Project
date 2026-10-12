@@ -568,6 +568,9 @@
     <ClInclude Include="Source\Entities\TerrainGenerator.h">
       <Filter>Entities</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Entities\TerrainCollapse.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Entities\TerrainFire.h">
       <Filter>Entities</Filter>
     </ClInclude>
@@ -1176,6 +1179,9 @@
       <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="Source\Entities\TerrainGenerator.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Entities\TerrainCollapse.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="Source\Entities\TerrainFire.cpp">

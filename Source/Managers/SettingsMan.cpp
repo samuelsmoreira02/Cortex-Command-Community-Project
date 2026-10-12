@@ -146,6 +146,7 @@ int SettingsMan::ReadProperty(const std::string_view& propName, Reader& reader) 
 	MatchProperty("ShowEnemyHUD", { reader >> m_ShowEnemyHUD; });
 	MatchProperty("SmartBuyMenuNavigation", { reader >> m_EnableSmartBuyMenuNavigation; });
 	MatchProperty("ScrapCompactingHeight", { reader >> g_SceneMan.m_ScrapCompactingHeight; });
+	MatchProperty("StructuralCollapse", { reader >> g_SceneMan.m_StructuralCollapse; });
 	MatchProperty("AutomaticGoldDeposit", { reader >> m_AutomaticGoldDeposit; });
 	MatchProperty("ScreenShakeStrength", { reader >> g_CameraMan.m_ScreenShakeStrength; });
 	MatchProperty("ScreenShakeDecay", { reader >> g_CameraMan.m_ScreenShakeDecay; });
@@ -258,6 +259,7 @@ int SettingsMan::Save(Writer& writer) const {
 	writer.NewPropertyWithValue("ShowEnemyHUD", m_ShowEnemyHUD);
 	writer.NewPropertyWithValue("SmartBuyMenuNavigation", m_EnableSmartBuyMenuNavigation);
 	writer.NewPropertyWithValue("ScrapCompactingHeight", g_SceneMan.m_ScrapCompactingHeight);
+	writer.NewPropertyWithValue("StructuralCollapse", g_SceneMan.m_StructuralCollapse);
 	writer.NewPropertyWithValue("AutomaticGoldDeposit", m_AutomaticGoldDeposit);
 
 	writer.NewLine(false, 2);

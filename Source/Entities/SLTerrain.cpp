@@ -507,6 +507,7 @@ std::deque<MOPixel*> SLTerrain::EraseSilhouette(BITMAP* sprite, const Vector& po
 	}
 	// TODO: improve fit/tightness of box here.
 	m_UpdatedMaterialAreas.emplace_back(Box(pos - pivot, static_cast<float>(maxWidth), static_cast<float>(maxHeight)));
+	g_SceneMan.RegisterRemovedTerrain((pos - pivot).GetFloorIntX(), (pos - pivot).GetFloorIntY(), maxWidth, maxHeight);
 
 	return dislodgedMOPixels;
 }

@@ -11,6 +11,7 @@
 #include "PathFinder.h"
 #include "SceneLayer.h"
 #include "TerrainFire.h"
+#include "TerrainCollapse.h"
 
 #include <array>
 #include <map>
@@ -688,6 +689,10 @@ namespace RTE {
 		/// @return The terrain fire.
 		TerrainFire& GetTerrainFire() { return m_TerrainFire; }
 
+		/// Gets what makes this Scene's unsupported terrain fall.
+		/// @return The terrain collapse.
+		TerrainCollapse& GetTerrainCollapse() { return m_TerrainCollapse; }
+
 		/// Whether this scene is a temprorary metagame scene and should
 		/// not be used anywhere except in metagame.
 		/// @return Whether scene belongs to metagame or not.
@@ -753,6 +758,8 @@ namespace RTE {
 		bool m_PathfindingUpdated;
 		// The fire burning through the terrain.
 		TerrainFire m_TerrainFire;
+		// Makes terrain that lost its support fall.
+		TerrainCollapse m_TerrainCollapse;
 		// Timer for when to do an update of the pathfinding data
 		Timer m_PartialPathUpdateTimer;
 

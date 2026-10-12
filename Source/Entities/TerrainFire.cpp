@@ -130,6 +130,14 @@ void TerrainFire::Update(SLTerrain* terrain) {
 		// Igniting neighbours appends to m_BurningPixels, which can reallocate it, so don't hold a reference to an element across that.
 		const int pixelX = m_BurningPixels[i].X;
 		const int pixelY = m_BurningPixels[i].Y;
+
+		// The pixel may have been blown away or fallen with collapsing terrain since it caught fire, so stop burning it if what's there now can't burn.
+		const Material* burningMaterial = g_SceneMan.GetMaterialFromID(terrain->GetMaterialPixel(pixelX, pixelY));
+		if (!burningMaterial || burningMaterial->GetFlammability() <= 0) {
+			m_BurningPixels[i].TimeLeftMS = 0;
+			m_BurningPositions.erase(pixelY * width + pixelX);
+			continue;
+		}
 		m_BurningPixels[i].TimeLeftMS -= elapsedMS;
 
 		for (const SpreadDirection& direction: c_SpreadDirections) {
@@ -159,13 +167,16 @@ void TerrainFire::Update(SLTerrain* terrain) {
 		if (m_BurningPixels[i].TimeLeftMS > 0) {
 			terrain->SetFGColorPixel(pixelX, pixelY, m_FireColors[RandomNum<int>(0, static_cast<int>(m_FireColors.size()) - 1)]);
 		} else {
-			const Material* material = g_SceneMan.GetMaterialFromID(terrain->GetMaterialPixel(pixelX, pixelY));
-			const unsigned char burntMaterialIndex = material ? material->GetBurnsIntoIndex() : MaterialColorKeys::g_MaterialAir;
+			const unsigned char burntMaterialIndex = burningMaterial->GetBurnsIntoIndex();
 			const Material* burntMaterial = g_SceneMan.GetMaterialFromID(burntMaterialIndex);
 			terrain->SetMaterialPixel(pixelX, pixelY, burntMaterialIndex);
 			terrain->SetFGColorPixel(pixelX, pixelY, (burntMaterialIndex == MaterialColorKeys::g_MaterialAir || !burntMaterial) ? ColorKeys::g_MaskColor : burntMaterial->GetColorIndex());
 			m_BurningPositions.erase(pixelY * width + pixelX);
 			anyBurnedOut = true;
+			if (burntMaterialIndex == MaterialColorKeys::g_MaterialAir) {
+				// Burning away may leave what the pixel was holding up hanging, so let it fall.
+				g_SceneMan.RegisterRemovedTerrain(pixelX, pixelY);
+			}
 			minX = std::min(minX, pixelX);
 			minY = std::min(minY, pixelY);
 			maxX = std::max(maxX, pixelX);

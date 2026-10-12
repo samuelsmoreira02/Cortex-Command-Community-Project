@@ -138,6 +138,25 @@ namespace RTE {
 		/// @return The number of burning terrain pixels.
 		int GetBurningTerrainPixelCount() const;
 
+		/// Registers that terrain was removed, so the terrain around it gets checked for pieces that lost their support and should fall.
+		/// @param left The left edge of the removed area. It doesn't need to be wrapped.
+		/// @param top The top edge of the removed area.
+		/// @param width The width of the removed area, in pixels.
+		/// @param height The height of the removed area, in pixels.
+		void RegisterRemovedTerrain(int left, int top, int width = 1, int height = 1);
+
+		/// Gets how many chunks of terrain are currently falling.
+		/// @return The number of falling terrain chunks.
+		int GetFallingTerrainChunkCount() const;
+
+		/// Gets whether terrain that loses its support falls.
+		/// @return Whether structural collapse is enabled.
+		bool GetStructuralCollapse() const { return m_StructuralCollapse; }
+
+		/// Sets whether terrain that loses its support falls.
+		/// @param enable Whether to enable structural collapse.
+		void SetStructuralCollapse(bool enable) { m_StructuralCollapse = enable; }
+
 		/// Gets whether objects are placed when the Scene is initially started. Used for saving/loading games.
 		/// @return Whether objects are placed when the Scene is initially started.
 		bool GetPlaceObjectsOnLoad() const { return m_PlaceObjects; }
@@ -1050,6 +1069,7 @@ namespace RTE {
 		BITMAP* m_pOrphanSearchBitmap;
 
 		int m_ScrapCompactingHeight; //!< The maximum height of a column of scrap terrain to collapse, when the bottom pixel is knocked loose.
+		bool m_StructuralCollapse; //!< Whether terrain that loses its support falls.
 
 		/// Private member variable and method declarations
 	private:

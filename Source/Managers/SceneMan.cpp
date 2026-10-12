@@ -70,6 +70,7 @@ void SceneMan::Clear() {
 	m_pOrphanSearchBitmap = create_bitmap_ex(8, MAXORPHANRADIUS, MAXORPHANRADIUS);
 
 	m_ScrapCompactingHeight = 25;
+	m_StructuralCollapse = true;
 }
 
 void SceneMan::Initialize() const {
@@ -190,6 +191,16 @@ int SceneMan::ExtinguishTerrain(const Vector& pos, float radius) {
 
 int SceneMan::GetBurningTerrainPixelCount() const {
 	return m_pCurrentScene ? m_pCurrentScene->GetTerrainFire().GetBurningPixelCount() : 0;
+}
+
+void SceneMan::RegisterRemovedTerrain(int left, int top, int width, int height) {
+	if (m_StructuralCollapse && m_pCurrentScene) {
+		m_pCurrentScene->GetTerrainCollapse().RegisterRemovedArea(left, top, width, height);
+	}
+}
+
+int SceneMan::GetFallingTerrainChunkCount() const {
+	return m_pCurrentScene ? m_pCurrentScene->GetTerrainCollapse().GetFallingChunkCount() : 0;
 }
 
 int SceneMan::SetSceneToLoad(const std::string& sceneName, bool placeObjects, bool placeUnits) {
@@ -640,6 +651,7 @@ bool SceneMan::TryPenetrate(int posX,
 			m_pCurrentScene->GetTerrain()->SetFGColorPixel(posX, posY, g_MaskColor);
 			m_pCurrentScene->GetTerrain()->SetMaterialPixel(posX, posY, g_MaterialAir);
 		}
+		RegisterRemovedTerrain(posX, posY);
 
 		// Save the impulse force effects of the penetrating particle.
 		//        retardation = -sceneMat.density;
@@ -658,6 +670,7 @@ bool SceneMan::TryPenetrate(int posX,
 			float sprayMag = std::sqrt(velocity.GetMagnitude() * sprayScale);
 			Vector sprayVel;
 
+			RegisterRemovedTerrain(posX, posY - m_ScrapCompactingHeight, 1, m_ScrapCompactingHeight);
 			for (int testY = posY - 1; testY > posY - m_ScrapCompactingHeight && testY >= 0; --testY) {
 				if ((testMaterialID = _getpixel(pMaterial, posX, testY)) != g_MaterialAir) {
 					sceneMat = GetMaterialFromID(testMaterialID);
@@ -732,6 +745,7 @@ MOPixel* SceneMan::DislodgePixel(int posX, int posY) {
 
 	m_pCurrentScene->GetTerrain()->SetFGColorPixel(posX, posY, ColorKeys::g_MaskColor);
 	m_pCurrentScene->GetTerrain()->SetMaterialPixel(posX, posY, MaterialColorKeys::g_MaterialAir);
+	RegisterRemovedTerrain(posX, posY);
 
 	return pixelMO;
 }
@@ -820,8 +834,8 @@ std::vector<MOPixel*>* SceneMan::DislodgePixelBox(const Vector& upperLeftCorner,
 
 	float width = end.m_X - start.m_X;
 	float height = end.m_Y - start.m_Y;
-	for (int x = 0; x <= static_cast<int>(width) * 2; x++) {
-		for (int y = 0; y <= static_cast<int>(height) * 2; y++) {
+	for (int x = 0; x <= static_cast<int>(width); x++) {
+		for (int y = 0; y <= static_cast<int>(height); y++) {
 			Vector checkPos = start + Vector(static_cast<float>(x), static_cast<float>(y));
 			MOPixel* px = DislodgePixelBool(checkPos.m_X, checkPos.m_Y, deletePixels);
 			if (px) {
