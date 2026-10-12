@@ -1063,7 +1063,8 @@ void FrameMan::DrawWorldDump(bool drawForScenePreview) const {
 			hline(m_WorldDumpBuffer.get(), 0, i, worldBitmapWidth - 1, lineColor);
 		}
 	} else {
-		clear_to_color(m_WorldDumpBuffer.get(), makecol32(255, 0, 255)); // Magenta
+		// The scene preview is drawn over a sky gradient with a masked blit, so the sky here must be exactly the mask color that blit skips.
+		clear_to_color(m_WorldDumpBuffer.get(), bitmap_mask_color(m_WorldDumpBuffer.get()));
 	}
 
 	// Draw scene
