@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 <details><summary><b>Added</b></summary>
 
+- New global script "Tactical Squads".  
+	Squad leaders get a "Squad Orders" sub pie menu: Hold Position (members stay where they are), Follow Me, Hold Fire / Fire At Will, and Change Formation, which cycles between Tight (the old behaviour), Column and Spread. In Column and Spread, members line up behind the leader 24 or 48 pixels apart, which keeps a squad from being wiped out by a single explosion.  
+	The leader's HUD shows a line to each member, and the squad's size, formation and fire orders.  
+	Orders are stored as `NumberValue`s read by the native human and crab AIs, so without the script enabled squads behave as before. `Activity.UNITSELECTCIRCLE` is now exposed to Lua.
+
+- New global script "Tactical Time", which slows the game down to 10% while you give orders: with the pie menu open, setting AI waypoints or selecting units for a squad. The game keeps responding to input at full rate.
+
 - Pathfinding and navigation overhaul, including jetpack/jump-aware pathfinding.  
 	Actors will now choose their path depending on how high they can jump, instead of always taking the shortest flying path. This will reduce instances of the AI getting stuck while trying to take paths that are impossible for them.  
 	Improvements to both `ACrab` and `AHuman` navigation. `ACrab`s are now aware of how to pathfind and navigate using their jetpack, and will use it where applicable. Actors are better at using their jetpack, and will use automovers if their jetpack is not sufficient to reach a destination.  
@@ -291,6 +298,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed a race where removing an `Actor` (e.g. through `MovableMan:RemoveActor`) while the previous update's seeing rays were still being cast could crash.
 
 - Fixed a small leak every time displays were mapped.
+
+- Fixed `Settings.ini` being written with a garbage value for `MuteAudioOnFocusLoss` on first launch, which then made the game ignore every setting after it (skip intro, launching into an activity, enabled global scripts and more) on every following launch.
 
 </details>
 
