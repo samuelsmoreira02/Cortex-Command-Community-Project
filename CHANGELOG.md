@@ -15,6 +15,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - New global script "Tactical Time", which slows the game down to 10% while you give orders: with the pie menu open, setting AI waypoints or selecting units for a squad. The game keeps responding to input at full rate.
 
+- New activity "Expedition", a roguelite run through five procedurally generated sectors.  
+	You lead a commander and a small squad. Each sector has an objective (Purge: kill a number of enemies, Prospect: collect gold, and a final Last Stand), and enemy drops get more frequent the deeper you go. Surviving units carry over to the next sector, and after each sector you choose one of three upgrades from your commander's pie menu (Reinforced Armor, Field Medic, Recruit, War Chest, Extra Fuel, Heavy Weapons). Losing the commander ends the expedition.  
+	Sectors cleared across all expeditions earn permanent veterancy ranks, which add starting gold and, from rank 3, an extra soldier. Progress is kept in `Userdata/UserSavedGames.rte/ExpeditionProgress.txt`. Every expedition has a seed that determines all its sectors, and expeditions can be saved and loaded mid-run.
+
+- Procedurally generated terrain.  
+	`SLTerrain` can have a `ProceduralGenerator = TerrainGenerator` instead of a `BitmapFile`, generating the material layer from a seed: a fractal surface (`SurfaceLevel`, `SurfaceAmplitude`, `SurfaceFeatureSize`, `SurfaceRoughness`), material layers by depth with uneven boundaries (`AddLayer = TerrainGeneratorLayer` with `Material` and `Thickness`), and caves (`CaveDensity`, `CaveFeatureSize`, `CaveMinDepth`). Generated terrain wraps seamlessly when `WrapX` is set, and is texturized, frosted and given debris as usual. A `Seed` other than 0 always generates the same terrain.  
+	New scenes "Expedition Highlands", "Expedition Desert" and "Expedition Tundra" use it.
+
+- New Lua functions `SceneMan:SetNextProceduralTerrainSeed(seed)`, `SceneMan:GetLastProceduralTerrainSeed()`, `SceneMan:SetSceneToLoad(sceneName, placeObjects, placeUnits)`, `ActivityMan:SetRestartActivity(restart)`, `FrameMan:SaveWorldToPNG(nameBase)` and `FrameMan:SaveWorldPreviewToPNG(nameBase)`.
+
 - Pathfinding and navigation overhaul, including jetpack/jump-aware pathfinding.  
 	Actors will now choose their path depending on how high they can jump, instead of always taking the shortest flying path. This will reduce instances of the AI getting stuck while trying to take paths that are impossible for them.  
 	Improvements to both `ACrab` and `AHuman` navigation. `ACrab`s are now aware of how to pathfind and navigate using their jetpack, and will use it where applicable. Actors are better at using their jetpack, and will use automovers if their jetpack is not sufficient to reach a destination.  
@@ -300,6 +310,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed a small leak every time displays were mapped.
 
 - Fixed `Settings.ini` being written with a garbage value for `MuteAudioOnFocusLoss` on first launch, which then made the game ignore every setting after it (skip intro, launching into an activity, enabled global scripts and more) on every following launch.
+
+- Fixed scene preview dumps having a magenta sky instead of the sky gradient.
 
 </details>
 
