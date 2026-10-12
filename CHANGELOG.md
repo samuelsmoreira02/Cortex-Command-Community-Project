@@ -280,6 +280,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fixed a possible abort on launch or during play when two timer updates happened within the same microsecond.
 
+- Fixed scene preview dumps producing a garbled image, as the 32bpp image was no longer reduced to the palette before being saved as an indexed PNG.
+
+- Fixed clipboard copy reporting failure on success, and pasting leaking the clipboard text.
+
+- Fixed `UInputMan.FlagAltState` always being true.
+
+- Fixed a crash on launch when more gamepads were connected than players set to use gamepads.
+
+- Fixed a race where removing an `Actor` (e.g. through `MovableMan:RemoveActor`) while the previous update's seeing rays were still being cast could crash.
+
+- Fixed a small leak every time displays were mapped.
+
 </details>
 
 <details><summary><b>Removed</b></summary>
