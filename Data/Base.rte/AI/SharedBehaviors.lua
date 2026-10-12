@@ -1040,6 +1040,20 @@ function SharedBehaviors.GoToWpt(AI, Owner, Abort)
 	return true;
 end
 
+-- Darkness hides units: in the dark, targets can only be spotted up close. Light sources, including the glow of a unit's own gunfire, give units away.
+function SharedBehaviors.IsHiddenInDarkness(Owner, Target)
+	if PostProcessMan.AmbientLightLevel >= 0.5 then
+		return false;
+	end
+	local lightLevel = PostProcessMan:GetLightLevelAt(Target.Pos);
+	if lightLevel >= 0.5 then
+		return false;
+	end
+	-- About 100 pixels on a dark night (light level around 0.2), up to about 560 at half light.
+	local spotDistance = 80 + 1600 * math.max(lightLevel - 0.2, 0);
+	return SceneMan:ShortestDistance(Owner.Pos, Target.Pos, SceneMan.SceneWrapsX):MagnitudeIsGreaterThan(spotDistance);
+end
+
 function SharedBehaviors.CalculateThreatLevel(MO, Owner)
 	-- prioritize closer targets
 	local priority = -SceneMan:ShortestDistance(Owner.Pos, MO.Pos, false).Largest / FrameMan.PlayerScreenWidth;

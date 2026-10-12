@@ -14,6 +14,8 @@ function CrabBehaviors.LookForTargets(AI, Owner)
 		HitPoint = SceneMan:GetLastRayHitPos();
 		if AI.isPlayerOwned and SceneMan:IsUnseen(HitPoint.X, HitPoint.Y, Owner.Team) and SceneMan:IsUnseen(FoundMO.Pos.X, FoundMO.Pos.Y, Owner.Team) then -- AI-teams ignore the fog
 			FoundMO = nil; -- target hidden behind the fog
+		elseif FoundMO.Team ~= Owner.Team and SharedBehaviors.IsHiddenInDarkness(Owner, FoundMO) then
+			FoundMO = nil; -- target hidden in the dark
 		end
 	end
 

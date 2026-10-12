@@ -275,6 +275,9 @@ function NativeHumanAI:Update(Owner)
 	local FoundMO, HitPoint;
 	if not TacticalSquad.IsHoldingFire(Owner) then
 		FoundMO, HitPoint = self.SpotTargets(self, Owner, self.skill);
+		if FoundMO and FoundMO.Team ~= Owner.Team and SharedBehaviors.IsHiddenInDarkness(Owner, FoundMO) then
+			FoundMO = nil; -- target hidden in the dark
+		end
 	end
 	if FoundMO then
 		--TODO: decide whether to attack based on the material strength of found MO
