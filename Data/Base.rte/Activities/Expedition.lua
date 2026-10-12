@@ -130,7 +130,8 @@ function Expedition:EndActivity()
 end
 
 function Expedition:UpdateActivity()
-	if self.ActivityState == Activity.OVER or self.ActivityState == Activity.EDITING then
+	-- The run is cleared as soon as the expedition ends, which can happen partway through an update.
+	if self.ActivityState == Activity.OVER or self.ActivityState == Activity.EDITING or not ExpeditionRun then
 		return;
 	end
 
@@ -146,7 +147,10 @@ function Expedition:UpdateActivity()
 			self:CompleteSector();
 		end
 	elseif self.sectorState == "ChoosingUpgrade" then
-		self:CheckCommanders();
+		-- The commander can still die while the upgrade is being picked, which ends the expedition.
+		if not self:CheckCommanders() then
+			return;
+		end
 		self:UpdateUpgradeChoice();
 	end
 

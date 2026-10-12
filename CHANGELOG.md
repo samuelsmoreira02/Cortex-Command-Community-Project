@@ -36,6 +36,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 	New `Material` INI properties `Flammability` (0 to 1, 0 by default, which never burns), `BurnTime` (in milliseconds, 3000 by default) and `BurnsInto` (the material index it turns into, air by default).  
 	New Lua functions `SceneMan:IgniteTerrain(pos, radius)`, `SceneMan:ExtinguishTerrain(pos, radius)` (both return how many pixels were affected) and `SceneMan:GetBurningTerrainPixelCount()`.
 
+- Arsenal: seven new weapons in Base, each with its own recolored sprite, buyable by every faction and the legendary drops of the "Loot Drops" global script.  
+	**Arc Caster** (secondary): bolts that arc lightning from what they hit to up to three more enemies nearby.  
+	**Railgun** (heavy, sniper): charges up, then fires a slug that tears straight through terrain and every unit in a line.  
+	**MIRV Launcher** (heavy, explosive): a rocket that splits into six rockets at the top of its arc.  
+	**Cryo Projector** (CQB): a freezing spray. Enough of it freezes units solid for a few seconds, unable to move, and frozen units shatter at the slightest hit.  
+	**Dragon's Breath** (CQB): an incendiary shotgun that sets units and flammable terrain on fire.  
+	**Singularity Grenade**: hovers and drags in units, items and the ground around it, then detonates in the middle of it all.  
+	**Airstrike Beacon**: marks a spot with a red laser and beeps, then six rockets fall from the sky around it.
+
+- New global script "Combat Feedback". Hit markers and floating damage numbers for your team's hits, multi-kill (double kill up to ultra kill) and killing spree announcements for the unit you control, a short hit stop on multi-kills and a slow-motion moment on spree milestones, and bonus gold for every kill that grows while your team keeps up a combo.
+
+- New global script "Loot Drops". Enemies your team kills drop loot colored by rarity, picked up by walking over it: gold (common, white), medkits (uncommon, green), 15-second power-ups (rare, cyan: Overdrive for faster fire and reloads, Adrenaline for rapid healing and steady footing, Rocket Fuel for an endless jetpack, Bottomless Mag for no reloading) and, now and then, a legendary Arsenal weapon (gold) marked with a beam of light.
+
 - New global script "Colorblind Team Markers". Marks every unit with a symbol above its head that shows its team by shape as well as color: a blue circle, an orange square, a yellow triangle or a light blue diamond. The colors stay distinguishable with red-green and blue-yellow colorblindness.
 
 - New global script "Photo Mode". Press F8 to hide the HUD, slow the game to a near stop, freeze the unit you control and fly the camera around with the arrow keys or WASD (hold Shift to go faster). Take pictures with F12. Press F8 again to go back to the game.
@@ -271,6 +284,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 </details>
 
 <details><summary><b>Fixed</b></summary>
+
+- Fixed the Expedition activity throwing a Lua error when the commander died while an upgrade was being chosen.
 
 - Fixed `SceneMan:DislodgePixelBox()` dislodging a box twice as wide and twice as tall as the one asked for.
 

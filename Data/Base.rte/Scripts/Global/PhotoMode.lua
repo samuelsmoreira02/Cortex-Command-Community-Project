@@ -36,7 +36,8 @@ end
 
 function PhotoModeScript:Start(activity)
 	self.active = true;
-	self.savedTimeScale = TimerMan.TimeScale;
+	-- Another script's brief slow motion (like a hit stop) may be on right now, and shouldn't be brought back for good when leaving photo mode.
+	self.savedTimeScale = TimerMan.TimeScale >= 0.5 and TimerMan.TimeScale or 1;
 	TimerMan.TimeScale = self.slowMotionTimeScale;
 	self.frameTimer:Reset();
 	for player = Activity.PLAYER_1, Activity.MAXPLAYERCOUNT - 1 do
