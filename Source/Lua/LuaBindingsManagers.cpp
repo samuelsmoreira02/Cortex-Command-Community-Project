@@ -16,6 +16,7 @@ LuaBindingRegisterFunctionDefinitionForType(ManagerLuaBindings, ActivityMan) {
 	    .def("StartActivity", (int(ActivityMan::*)(Activity*)) & ActivityMan::StartActivity, luabind::adopt(_2)) // Transfers ownership of the Activity to start into the ActivityMan, adopts ownership (_1 is the this ptr)
 	    .def("StartActivity", (int(ActivityMan::*)(const std::string&, const std::string&)) & ActivityMan::StartActivity)
 	    .def("RestartActivity", &ActivityMan::RestartActivity)
+	    .def("SetRestartActivity", &ActivityMan::SetRestartActivity)
 	    .def("PauseActivity", &ActivityMan::PauseActivity)
 	    .def("EndActivity", &ActivityMan::EndActivity)
 	    .def("ActivityRunning", &ActivityMan::ActivityRunning)
