@@ -53,6 +53,8 @@ function TacticalSquadOrders.FollowLeader(leader)
 			member:ClearAIWaypoints();
 			member.AIMode = Actor.AIMODE_SQUAD;
 			member:AddAIMOWaypoint(leader);
+			-- Same as Form Squad does. Without it the AI sees a squad member with nothing to follow and drops back to sentry.
+			member:SetMovePathToUpdate();
 			member:FlashWhite(100);
 		end
 	end

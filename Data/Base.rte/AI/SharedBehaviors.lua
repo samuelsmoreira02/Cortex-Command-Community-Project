@@ -1,3 +1,5 @@
+require("AI/TacticalSquad");
+
 SharedBehaviors = {};
 
 function SharedBehaviors.GetTeamShootingSkill(team)
@@ -582,11 +584,12 @@ function SharedBehaviors.GoToWpt(AI, Owner, Abort)
 			if Owner.MovePathSize == 0 then	-- arrived
 				if Owner.MOMoveTarget then -- following actor
 					if Owner.MOMoveTarget:IsActor() then
-						local Trace = SceneMan:ShortestDistance(Owner.Pos, Owner.MOMoveTarget.Pos, false);
-						if Trace.Largest < Owner.Height * 0.5 + (Owner.MOMoveTarget.Height or 100) * 0.5 and
+						local TargetPos, GetArriveDistance = TacticalSquad.GetMoveTargetPos(AI, Owner);
+						local Trace = SceneMan:ShortestDistance(Owner.Pos, TargetPos, false);
+						if Trace.Largest < GetArriveDistance(0.5) and
 							SceneMan:CastStrengthRay(Owner.Pos, Trace, 5, Vector(), 4, rte.grassID, true)
 						then -- add a waypoint if the MOMoveTarget is close and in LOS
-							Waypoint = {Pos=SceneMan:MovePointToGround(Owner.MOMoveTarget.Pos, Owner.Height*0.2, 4)};
+							Waypoint = {Pos=SceneMan:MovePointToGround(TargetPos, Owner.Height*0.2, 4)};
 						else
 							NeedsNewPath = true; -- update the path
 						end
@@ -610,12 +613,14 @@ function SharedBehaviors.GoToWpt(AI, Owner, Abort)
 			else
 				if Waypoint then
 					if Owner.MOMoveTarget and MovableMan:ValidMO(Owner.MOMoveTarget) then
-						local Trace = SceneMan:ShortestDistance(Owner.Pos, Owner.MOMoveTarget.Pos, false);
+						-- squad members in formation follow their slot instead of the leader itself
+						local TargetPos, GetArriveDistance = TacticalSquad.GetMoveTargetPos(AI, Owner);
+						local Trace = SceneMan:ShortestDistance(Owner.Pos, TargetPos, false);
 
 						-- WTF is the following code for? It causes us to idle and do nothing forever??
 						if Owner.MOMoveTarget.Team == Owner.Team then
-							if Trace.Largest > Owner.Height * 0.3 + (Owner.MOMoveTarget.Height or 100) * 0.3 then
-								Waypoint.Pos = Owner.MOMoveTarget.Pos;
+							if Trace.Largest > GetArriveDistance(0.3) then
+								Waypoint.Pos = TargetPos;
 							else	-- arrived
 								if not AI.flying then
 									while true do
@@ -628,8 +633,9 @@ function SharedBehaviors.GoToWpt(AI, Owner, Abort)
 										if _abrt then return true end
 
 										if Owner.MOMoveTarget and MovableMan:ValidMO(Owner.MOMoveTarget) then
-											Trace = SceneMan:ShortestDistance(Owner.Pos, Owner.MOMoveTarget.Pos, false);
-											if Trace.Largest > Owner.Height * 0.4 + (Owner.MOMoveTarget.Height or 100) * 0.4 or
+											TargetPos, GetArriveDistance = TacticalSquad.GetMoveTargetPos(AI, Owner);
+											Trace = SceneMan:ShortestDistance(Owner.Pos, TargetPos, false);
+											if Trace.Largest > GetArriveDistance(0.4) or
 												SceneMan:CastStrengthRay(Owner.Pos, Trace, 5, Vector(), 4, rte.doorID, true)
 											then
 												Waypoint = nil;

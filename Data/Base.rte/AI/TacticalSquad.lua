@@ -18,6 +18,25 @@ function TacticalSquad.IsHoldingFire(Owner)
 	return Owner:NumberValueExists("TacticalSquadHoldFire") and (Owner.AIMode == Actor.AIMODE_SQUAD or Owner.AIMode == Actor.AIMODE_SENTRY);
 end
 
+-- How close a squad member must get to its formation slot to count as there. Slots are only 24 pixels apart, much less than the usual "next to the target" distances based on actor sizes.
+TacticalSquad.SlotArriveDistance = 12;
+
+-- For an AI following Owner.MOMoveTarget, returns where to go and a function giving the "close enough" distance for a given fraction of the actors' sizes.
+-- Squad members in a formation go to their slot, which is a point rather than a body, so it uses a fixed, small distance instead.
+function TacticalSquad.GetMoveTargetPos(AI, Owner)
+	local Target = Owner.MOMoveTarget;
+	if Owner.AIMode == Actor.AIMODE_SQUAD and IsActor(Target) and Owner:NumberValueExists("TacticalSquadSlot") then
+		local Leader = ToActor(Target);
+		local formation = Leader:NumberValueExists("TacticalSquadFormation") and Leader:GetNumberValue("TacticalSquadFormation") or TacticalSquad.FormationTight;
+		if TacticalSquad.FormationSpacing[formation] then
+			-- The ratios used are 0.3 to arrive and 0.4 to leave again, which keeps the same hysteresis here, and 0.5 to walk straight there instead of pathfinding, which stays based on our size.
+			return TacticalSquad.GetFollowPos(AI, Owner, Leader), function(ratio) return ratio >= 0.5 and Owner.Height * ratio or TacticalSquad.SlotArriveDistance * ratio / 0.3; end;
+		end
+	end
+	local targetHeight = Target.Height or 100;
+	return Target.Pos, function(ratio) return (Owner.Height + targetHeight) * ratio; end;
+end
+
 -- Returns the position this squad member should move to: its slot in the leader's formation, or the leader's position if it has none.
 function TacticalSquad.GetFollowPos(AI, Owner, Leader)
 	local formation = Leader:NumberValueExists("TacticalSquadFormation") and Leader:GetNumberValue("TacticalSquadFormation") or TacticalSquad.FormationTight;
