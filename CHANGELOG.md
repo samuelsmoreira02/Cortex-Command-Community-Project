@@ -23,6 +23,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 	`SLTerrain` can have a `ProceduralGenerator = TerrainGenerator` instead of a `BitmapFile`, generating the material layer from a seed: a fractal surface (`SurfaceLevel`, `SurfaceAmplitude`, `SurfaceFeatureSize`, `SurfaceRoughness`), material layers by depth with uneven boundaries (`AddLayer = TerrainGeneratorLayer` with `Material` and `Thickness`), and caves (`CaveDensity`, `CaveFeatureSize`, `CaveMinDepth`). Generated terrain wraps seamlessly when `WrapX` is set, and is texturized, frosted and given debris as usual. A `Seed` other than 0 always generates the same terrain.  
 	New scenes "Expedition Highlands", "Expedition Desert" and "Expedition Tundra" use it.
 
+- Dynamic lighting.  
+	The scene can be darkened by an ambient light, and lit up around light sources, in a single GPU pass per player screen. It's drawn under primitives and the HUD, which stay readable, and before glows, which stay bright. Every glow effect (gunfire, explosions, lasers, jetpacks) is also a light source of its own color. In full daylight, which is the default, lighting does nothing and costs nothing.  
+	New Lua functions `PostProcessMan:SetAmbientLight(r, g, b)`, `PostProcessMan:SetAmbientLightDimming(dimming)`, `PostProcessMan:RegisterLight(pos, radius, intensity, r, g, b)` (lights last for the simulation update they're registered in) and `PostProcessMan:GetLightLevelAt(pos)`, and property `PostProcessMan.AmbientLightLevel` (R).
+
+- New global script "Day and Night Cycle". Day turns to dusk, night and dawn over 10 minutes. At night the unit each player controls carries a light, and units in the dark can only be spotted by the AI up close, so gunfire and lights give units away.
+
+- New global script "Dynamic Weather". Rain, or snow on snowy scenes, comes and goes using the existing weather effects, darkening the sky while it lasts. Deserts stay dry.
+
 - New Lua functions `SceneMan:SetNextProceduralTerrainSeed(seed)`, `SceneMan:GetLastProceduralTerrainSeed()`, `SceneMan:SetSceneToLoad(sceneName, placeObjects, placeUnits)`, `ActivityMan:SetRestartActivity(restart)`, `FrameMan:SaveWorldToPNG(nameBase)` and `FrameMan:SaveWorldPreviewToPNG(nameBase)`.
 
 - Pathfinding and navigation overhaul, including jetpack/jump-aware pathfinding.  
