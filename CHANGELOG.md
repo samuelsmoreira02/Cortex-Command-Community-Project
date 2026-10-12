@@ -292,6 +292,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fixed a small leak every time displays were mapped.
 
+- Fixed `Settings.ini` being written with a garbage value for `MuteAudioOnFocusLoss` on first launch, which then made the game ignore every setting after it (skip intro, launching into an activity, enabled global scripts and more) on every following launch.
+
 </details>
 
 <details><summary><b>Removed</b></summary>
