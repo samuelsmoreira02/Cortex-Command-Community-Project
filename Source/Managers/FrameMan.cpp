@@ -576,7 +576,7 @@ int FrameMan::SaveBitmap(SaveBitmapMode modeToSave, const std::string& nameBase,
 				blit(m_ScenePreviewDumpGradient.get(), scenePreviewDumpBuffer, 0, 0, 0, 0, scenePreviewDumpBuffer->w, scenePreviewDumpBuffer->h);
 				masked_stretch_blit(m_WorldDumpBuffer.get(), scenePreviewDumpBuffer, 0, 0, m_WorldDumpBuffer->w, m_WorldDumpBuffer->h, 0, 0, scenePreviewDumpBuffer->w, scenePreviewDumpBuffer->h);
 
-				if (SaveIndexedPNG(fullFileName.c_str(), scenePreviewDumpBuffer) == 0) {
+				if (SaveIndexedPNG(fullFileName.c_str(), scenePreviewDumpBuffer)) {
 					g_ConsoleMan.PrintString("SYSTEM: Scene Preview was dumped to: " + fullFileName);
 					saveSuccess = true;
 				}
@@ -631,19 +631,30 @@ void FrameMan::SaveScreenToBitmap() {
 	}
 }
 
-int FrameMan::SaveIndexedPNG(const char* fileName, BITMAP* bitmapToSave) const {
+bool FrameMan::SaveIndexedPNG(const char* fileName, BITMAP* bitmapToSave) const {
 	set_palette(m_DefaultPalette);
-	SDL_Surface* surface = SDL_CreateSurfaceFrom(bitmapToSave->w,
-	                                             bitmapToSave->h,
+
+	// The surface below is 8bpp indexed, so reduce the bitmap to the palette first if it isn't already. Blitting between color depths does the conversion.
+	BITMAP* indexedBitmap = bitmapToSave;
+	if (bitmap_color_depth(bitmapToSave) != 8) {
+		indexedBitmap = create_bitmap_ex(8, bitmapToSave->w, bitmapToSave->h);
+		blit(bitmapToSave, indexedBitmap, 0, 0, 0, 0, bitmapToSave->w, bitmapToSave->h);
+	}
+
+	SDL_Surface* surface = SDL_CreateSurfaceFrom(indexedBitmap->w,
+	                                             indexedBitmap->h,
 	                                             SDL_PIXELFORMAT_INDEX8,
-	                                             bitmapToSave->dat,
-	                                             bitmap_color_depth(bitmapToSave) / 8);
+	                                             indexedBitmap->dat,
+	                                             indexedBitmap->w);
 	SDL_Palette* pal = ContentFile::DefaultPaletteToSDL();
 	SDL_SetSurfacePalette(surface, pal);
-	int saveResult = IMG_SavePNG(surface, fileName);
+	bool saveResult = IMG_SavePNG(surface, fileName);
 	SDL_DestroyPalette(pal);
 	SDL_DestroySurface(surface);
 
+	if (indexedBitmap != bitmapToSave) {
+		destroy_bitmap(indexedBitmap);
+	}
 	return saveResult;
 }
 

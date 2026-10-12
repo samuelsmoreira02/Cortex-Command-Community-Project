@@ -346,7 +346,8 @@ void WindowMan::MapDisplays(bool updatePrimaryDisplayInfo) {
 		UpdatePrimaryDisplayInfo();
 	}
 
-	SDL_DisplayID* displays = SDL_GetDisplays(&m_NumDisplays);
+	// SDL3 hands over ownership of the returned array, so it must be freed on every return path.
+	std::unique_ptr<SDL_DisplayID[], decltype(&SDL_free)> displays(SDL_GetDisplays(&m_NumDisplays), &SDL_free);
 
 	if (!m_UseMultiDisplays || m_NumDisplays == 1) {
 		setSingleDisplayMode();

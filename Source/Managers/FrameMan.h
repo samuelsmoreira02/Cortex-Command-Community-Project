@@ -416,12 +416,12 @@ namespace RTE {
 		/// Saves a BITMAP as an 8bpp bitmap file that is indexed with the specified palette.
 		/// @param fileName The full name of the file that is being saved. Path and everything included.
 		/// @param bitmapToSave The BITMAP that is being saved into a file.
-		/// @return An error return value signaling success or any particular failure. Anything below 0 is an error signal.
+		/// @return Whether the file was saved successfully.
 		/// @remark
 		/// This method is a workaround to Allegro being unable to set a color conversion mode when saving files.
 		/// It works by first saving the 32bpp bitmap as is, then loading it back under the REDUCE_TO_256 color conversion mode, blitting it to a fresh bitmap and saving it again with the passed in palette.
 		/// The re-blitted bitmap is properly 8bpp and will be indexed correctly. The old saved file is deleted in the process before the new one is saved.
-		int SaveIndexedPNG(const char* fileName, BITMAP* bitmapToSave) const;
+		bool SaveIndexedPNG(const char* fileName, BITMAP* bitmapToSave) const;
 #pragma endregion
 
 		/// Shared method for drawing lines to avoid duplicate code. Will by called by either DrawLine() or DrawDotLine().
