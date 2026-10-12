@@ -51,6 +51,14 @@ void PostProcessMan::Clear() {
 	for (int i = 0; i < c_MaxScreenCount; ++i) {
 		m_ScreenRelativeEffects[i].clear();
 	}
+	m_AmbientRed = 1.0F;
+	m_AmbientGreen = 1.0F;
+	m_AmbientBlue = 1.0F;
+	m_AmbientLightDimming = 1.0F;
+	m_Lights.clear();
+	m_LightsSimUpdate = -1;
+	m_LastDrawnLights.clear();
+	m_GlowEffectLightColors.clear();
 }
 
 int PostProcessMan::Initialize() {
@@ -59,6 +67,7 @@ int PostProcessMan::Initialize() {
 
 	m_Blit8 = std::make_unique<Shader>(g_PresetMan.GetFullModulePath("Base.rte/Shaders/Blit8.vert"), g_PresetMan.GetFullModulePath("Base.rte/Shaders/Blit8.frag"));
 	m_PostProcessShader = std::make_unique<Shader>(g_PresetMan.GetFullModulePath("Base.rte/Shaders/PostProcess.vert"), g_PresetMan.GetFullModulePath("Base.rte/Shaders/PostProcess.frag"));
+	m_LightingShader = std::make_unique<Shader>(g_PresetMan.GetFullModulePath("Base.rte/Shaders/PostProcess.vert"), g_PresetMan.GetFullModulePath("Base.rte/Shaders/Lighting.frag"));
 	// TODO: Make more robust and load more glows!
 	ContentFile glowFile("Base.rte/Effects/Glows/YellowTiny.png");
 	m_YellowGlow = glowFile.GetAsBitmap();
@@ -433,4 +442,149 @@ void PostProcessMan::DrawPostScreenEffects() {
 			    {.r=effectStrength, .g=effectStrength, .b=effectStrength, .a=255});
 		}
 	}
+}
+
+void PostProcessMan::SetAmbientLight(float red, float green, float blue) {
+	m_AmbientRed = std::clamp(red, 0.0F, 1.0F);
+	m_AmbientGreen = std::clamp(green, 0.0F, 1.0F);
+	m_AmbientBlue = std::clamp(blue, 0.0F, 1.0F);
+}
+
+float PostProcessMan::GetAmbientLightLevel() const {
+	return (m_AmbientRed + m_AmbientGreen + m_AmbientBlue) / 3.0F * m_AmbientLightDimming;
+}
+
+void PostProcessMan::RegisterLight(const Vector& pos, float radius, float intensity, float red, float green, float blue) {
+	if (radius <= 0 || intensity <= 0) {
+		return;
+	}
+	std::scoped_lock<std::mutex> lightsLock(m_LightsMutex);
+	// Lights only last for the simulation update they're registered in, so a script that stops registering one turns it off.
+	if (m_LightsSimUpdate != g_TimerMan.GetSimUpdateCount()) {
+		m_Lights.clear();
+		m_LightsSimUpdate = g_TimerMan.GetSimUpdateCount();
+	}
+	m_Lights.push_back({pos, radius, intensity, std::clamp(red, 0.0F, 1.0F), std::clamp(green, 0.0F, 1.0F), std::clamp(blue, 0.0F, 1.0F)});
+}
+
+float PostProcessMan::GetLightLevelAt(const Vector& pos) const {
+	float lightLevel = GetAmbientLightLevel();
+	std::scoped_lock<std::mutex> lightsLock(m_LightsMutex);
+	for (const LightSource& light: m_LastDrawnLights) {
+		float distanceRatio = g_SceneMan.ShortestDistance(pos, light.Pos, g_SceneMan.SceneWrapsX()).GetMagnitude() / light.Radius;
+		if (distanceRatio < 1.0F) {
+			float falloff = 1.0F - distanceRatio;
+			lightLevel += light.Intensity * falloff * falloff * (light.Red + light.Green + light.Blue) / 3.0F;
+		}
+	}
+	return lightLevel;
+}
+
+std::array<float, 3> PostProcessMan::GetGlowEffectLightColor(BITMAP* glowBitmap) {
+	if (auto cachedColor = m_GlowEffectLightColors.find(glowBitmap); cachedColor != m_GlowEffectLightColors.end()) {
+		return cachedColor->second;
+	}
+	int colorDepth = bitmap_color_depth(glowBitmap);
+	int centerPixel = getpixel(glowBitmap, glowBitmap->w / 2, glowBitmap->h / 2);
+	std::array<float, 3> color = {static_cast<float>(getr_depth(colorDepth, centerPixel)), static_cast<float>(getg_depth(colorDepth, centerPixel)), static_cast<float>(getb_depth(colorDepth, centerPixel))};
+	// Glows fade towards their center pixel's color, so normalize it to get the light's hue at full brightness.
+	float brightest = std::max({color[0], color[1], color[2], 1.0F});
+	for (float& component: color) {
+		component /= brightest;
+	}
+	m_GlowEffectLightColors.try_emplace(glowBitmap, color);
+	return color;
+}
+
+void PostProcessMan::DrawLighting(const Vector& targetPos, int screenWidth, int screenHeight, const std::list<PostEffect>& screenRelativeEffects) {
+	ZoneScoped;
+
+	const float ambientRed = m_AmbientRed * m_AmbientLightDimming;
+	const float ambientGreen = m_AmbientGreen * m_AmbientLightDimming;
+	const float ambientBlue = m_AmbientBlue * m_AmbientLightDimming;
+
+	std::vector<LightSource> screenLights;
+	{
+		std::scoped_lock<std::mutex> lightsLock(m_LightsMutex);
+		m_LastDrawnLights.clear();
+		// Lights registered in an older simulation update are stale; whatever registered them has stopped.
+		if (m_LightsSimUpdate == g_TimerMan.GetSimUpdateCount()) {
+			m_LastDrawnLights = m_Lights;
+		}
+		for (const PostEffect& effect: screenRelativeEffects) {
+			if (effect.m_Bitmap) {
+				std::array<float, 3> color = GetGlowEffectLightColor(effect.m_Bitmap);
+				float radius = static_cast<float>(std::max(effect.m_Bitmap->w, effect.m_Bitmap->h)) * 1.5F;
+				m_LastDrawnLights.push_back({effect.m_Pos + targetPos, radius, static_cast<float>(effect.m_Strength) / 255.0F, color[0], color[1], color[2]});
+			}
+		}
+		if (ambientRed >= 1.0F && ambientGreen >= 1.0F && ambientBlue >= 1.0F) {
+			// Full daylight, nothing to darken.
+			return;
+		}
+
+		// Convert the lights to screen coordinates, accounting for wrapping, and keep those that reach the screen.
+		const float sceneWidth = static_cast<float>(g_SceneMan.GetSceneWidth());
+		for (const LightSource& light: m_LastDrawnLights) {
+			Vector screenPos = light.Pos - targetPos;
+			if (g_SceneMan.SceneWrapsX()) {
+				if (screenPos.m_X < -light.Radius) {
+					screenPos.m_X += sceneWidth;
+				} else if (screenPos.m_X > static_cast<float>(screenWidth) + light.Radius) {
+					screenPos.m_X -= sceneWidth;
+				}
+			}
+			if (screenPos.m_X > -light.Radius && screenPos.m_X < static_cast<float>(screenWidth) + light.Radius && screenPos.m_Y > -light.Radius && screenPos.m_Y < static_cast<float>(screenHeight) + light.Radius) {
+				screenLights.push_back({screenPos, light.Radius, light.Intensity, light.Red, light.Green, light.Blue});
+				if (screenLights.size() >= c_MaxLightsPerScreen) {
+					break;
+				}
+			}
+		}
+	}
+
+	std::vector<float> posRadiusIntensity;
+	std::vector<float> colors;
+	posRadiusIntensity.reserve(screenLights.size() * 4);
+	colors.reserve(screenLights.size() * 3);
+	for (const LightSource& light: screenLights) {
+		posRadiusIntensity.insert(posRadiusIntensity.end(), {light.Pos.m_X, light.Pos.m_Y, light.Radius, light.Intensity});
+		colors.insert(colors.end(), {light.Red, light.Green, light.Blue});
+	}
+
+	// Whatever was drawn so far has to be flushed with its own shader before switching.
+	rlDrawRenderBatchActive();
+	m_LightingShader->Begin();
+	m_LightingShader->SetVector2f("rteScreenSize", glm::vec2(static_cast<float>(screenWidth), static_cast<float>(screenHeight)));
+	m_LightingShader->SetVector3f("rteAmbientLight", glm::vec3(ambientRed, ambientGreen, ambientBlue));
+	m_LightingShader->SetInt("rteLightCount", static_cast<int>(screenLights.size()));
+	if (!screenLights.empty()) {
+		rlSetUniform(m_LightingShader->GetUniformLocation("rteLightPosRadiusIntensity"), posRadiusIntensity.data(), RL_SHADER_UNIFORM_VEC4, static_cast<int>(screenLights.size()));
+		rlSetUniform(m_LightingShader->GetUniformLocation("rteLightColor"), colors.data(), RL_SHADER_UNIFORM_VEC3, static_cast<int>(screenLights.size()));
+	}
+
+	// Multiply what's on the screen by the light, keeping its alpha.
+	rlDisableDepthTest();
+	rlEnableColorBlend();
+	rlSetBlendFactorsSeparate(GL_DST_COLOR, GL_ZERO, GL_ZERO, GL_ONE, GL_FUNC_ADD, GL_FUNC_ADD);
+	rlSetBlendMode(RL_BLEND_CUSTOM_SEPARATE);
+
+	const float width = static_cast<float>(screenWidth);
+	const float height = static_cast<float>(screenHeight);
+	rlBegin(RL_QUADS);
+	rlColor4ub(255, 255, 255, 255);
+	rlTexCoord2f(0.0F, 0.0F);
+	rlVertex2f(0.0F, 0.0F);
+	rlTexCoord2f(0.0F, 1.0F);
+	rlVertex2f(0.0F, height);
+	rlTexCoord2f(1.0F, 1.0F);
+	rlVertex2f(width, height);
+	rlTexCoord2f(1.0F, 0.0F);
+	rlVertex2f(width, 0.0F);
+	rlEnd();
+	rlDrawRenderBatchActive();
+
+	m_LightingShader->End();
+	rlSetBlendMode(RL_BLEND_ALPHA);
+	rlEnableDepthTest();
 }

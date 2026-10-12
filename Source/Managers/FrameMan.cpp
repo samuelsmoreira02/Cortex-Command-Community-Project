@@ -882,13 +882,20 @@ void FrameMan::Draw() {
 		// Draw the scene
 		g_SceneMan.Draw(drawScreen, drawScreenGUI, targetPos);
 
-		g_PrimitiveMan.DrawPrimitives(playerScreen, drawScreenGUI, targetPos);
-
 		// Get only the scene-relative post effects that affect this player's screen
 		if (pActivity) {
 			g_PostProcessMan.GetPostScreenEffectsWrapped(targetPos, drawScreen->w, drawScreen->h, screenRelativeEffects, pActivity->GetTeamOfPlayer(pActivity->PlayerOfScreen(playerScreen)));
 			g_PostProcessMan.GetGlowAreasWrapped(targetPos, drawScreen->w, drawScreen->h, screenRelativeGlowBoxes);
+
+			// Light the scene before primitives and the GUI go on top, so script overlays and the HUD stay readable, and before glows are added in post-processing, so they stay bright.
+			g_PostProcessMan.DrawLighting(targetPos, drawScreen->w, drawScreen->h, screenRelativeEffects);
+			backgroundShader.Begin();
+			backgroundShader.Enable();
+			rlSetUniformSampler(backgroundShader.GetUniformLocation("rtePalette"), g_PostProcessMan.GetPaletteTexture());
+			backgroundShader.SetInt("drawMasked", 1);
 		}
+
+		g_PrimitiveMan.DrawPrimitives(playerScreen, drawScreenGUI, targetPos);
 
 		// TODO: Find out what keeps disabling the clipping on the draw bitmap
 		// Enable clipping on the draw bitmap

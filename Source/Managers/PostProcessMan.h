@@ -7,10 +7,13 @@
 #include "SceneMan.h"
 #include "Shader.h"
 
+#include <algorithm>
 #include <array>
 #include <atomic>
 #include <memory>
 #include <list>
+#include <mutex>
+#include <unordered_map>
 #include <vector>
 
 #define g_PostProcessMan PostProcessMan::Instance()
@@ -139,6 +142,44 @@ namespace RTE {
 		bool GetGlowAreasWrapped(const Vector& boxPos, int boxWidth, int boxHeight, std::list<Box>& areaList) const;
 #pragma endregion
 
+#pragma region Lighting
+		/// Sets the ambient light, which is how lit everything is without any light sources. 1, 1, 1 is full daylight, where lighting has no effect.
+		/// @param red Red component, 0 to 1.
+		/// @param green Green component, 0 to 1.
+		/// @param blue Blue component, 0 to 1.
+		void SetAmbientLight(float red, float green, float blue);
+
+		/// Sets an extra multiplier for the ambient light, e.g. for overcast weather, so it can be changed independently from the time of day.
+		/// @param dimming The multiplier, 0 to 1.
+		void SetAmbientLightDimming(float dimming) { m_AmbientLightDimming = std::clamp(dimming, 0.0F, 1.0F); }
+
+		/// Gets the average of the effective ambient light's components, including dimming.
+		/// @return The ambient light level, 0 to 1.
+		float GetAmbientLightLevel() const;
+
+		/// Registers a light source for the current frame. Light sources only matter when the ambient light is below full daylight.
+		/// Must be registered every simulation update to stay lit.
+		/// @param pos The light's position, in scene coordinates.
+		/// @param radius How far the light reaches, in pixels.
+		/// @param intensity How bright the light is at its center. 1 lights things up fully even in total darkness.
+		/// @param red Red component of the light's color, 0 to 1.
+		/// @param green Green component of the light's color, 0 to 1.
+		/// @param blue Blue component of the light's color, 0 to 1.
+		void RegisterLight(const Vector& pos, float radius, float intensity, float red, float green, float blue);
+
+		/// Gets how lit a point in the scene was in the last drawn frame, from the ambient light and nearby light sources, including those from glow effects.
+		/// @param pos The point to check, in scene coordinates.
+		/// @return The light level, from 0 for darkness, to 1 or more for fully lit.
+		float GetLightLevelAt(const Vector& pos) const;
+
+		/// Darkens a player screen according to the ambient light and lights it up around light sources. Does nothing in full daylight.
+		/// @param targetPos The scene position of the top left corner of the player screen.
+		/// @param screenWidth The width of the player screen.
+		/// @param screenHeight The height of the player screen.
+		/// @param screenRelativeEffects The glow effects on this player screen, relative to it. They light up their surroundings.
+		void DrawLighting(const Vector& targetPos, int screenWidth, int screenHeight, const std::list<PostEffect>& screenRelativeEffects);
+#pragma endregion
+
 		/// Gets the backbuffer texture for indexed drawings.
 		/// @return The opengl backbuffer texture for indexed drawings.
 		std::shared_ptr<RenderTarget> GetPostProcessColorBuffer() { return m_PostProcessFramebuffer; }
@@ -175,6 +216,31 @@ namespace RTE {
 		GLuint m_VertexArray; //!< Vertex array for post-processing effects.
 		std::unique_ptr<Shader> m_Blit8; //!< Shader for blitting the 8bpp backbuffer to the 32bpp backbuffer.
 		std::unique_ptr<Shader> m_PostProcessShader; //!< Shader for drawing bitmap post effects.
+
+		/// A light source, in scene coordinates.
+		struct LightSource {
+			Vector Pos; //!< Position in the scene.
+			float Radius; //!< How far it reaches, in pixels.
+			float Intensity; //!< Brightness at its center.
+			float Red, Green, Blue; //!< Color, 0 to 1.
+		};
+		static constexpr int c_MaxLightsPerScreen = 64; //!< Must match c_MaxLights in Lighting.frag.
+
+		std::unique_ptr<Shader> m_LightingShader; //!< Shader for darkening the scene and lighting it up around light sources.
+		float m_AmbientRed; //!< Red component of the ambient light.
+		float m_AmbientGreen; //!< Green component of the ambient light.
+		float m_AmbientBlue; //!< Blue component of the ambient light.
+		float m_AmbientLightDimming; //!< Extra multiplier for the ambient light.
+		std::vector<LightSource> m_Lights; //!< Light sources registered in the latest simulation update.
+		long long m_LightsSimUpdate; //!< The simulation update the light sources were registered in. Lights from older updates are no longer registered, so they aren't drawn.
+		std::vector<LightSource> m_LastDrawnLights; //!< All light sources in the last drawn frame, including those from glow effects, for GetLightLevelAt.
+		mutable std::mutex m_LightsMutex; //!< Guards the light lists, which scripts can access from multiple threads.
+		std::unordered_map<BITMAP*, std::array<float, 3>> m_GlowEffectLightColors; //!< The light color of each glow effect bitmap, so it's only worked out once.
+
+		/// Gets the color a glow effect lights its surroundings up with: the color at its center.
+		/// @param glowBitmap The glow effect's bitmap.
+		/// @return The light color, 0 to 1 per component.
+		std::array<float, 3> GetGlowEffectLightColor(BITMAP* glowBitmap);
 
 #pragma region Post Effect Handling
 		/// Gets all screen effects that are located within a box in the scene. Their coordinates will be returned relative to the upper left corner of the box passed in here.
