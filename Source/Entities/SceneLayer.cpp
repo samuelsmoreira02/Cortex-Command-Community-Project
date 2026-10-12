@@ -206,8 +206,8 @@ int SceneLayerImpl<TRACK_DRAWINGS, STATIC_TEXTURE>::LoadData() {
 		m_MainBitmap = nullptr;
 	}
 
-	// Load from disk and take ownership. Don't cache because the bitmap will be modified.
-	m_MainBitmap = m_BitmapFile.GetAsBitmap(COLORCONV_NONE, false);
+	// Load from disk (or generate) and take ownership. Don't cache because the bitmap will be modified.
+	m_MainBitmap = LoadMainBitmap();
 	m_MainBitmapOwned = true;
 
 	m_BackBitmap = create_bitmap_ex(bitmap_color_depth(m_MainBitmap), m_MainBitmap->w, m_MainBitmap->h);

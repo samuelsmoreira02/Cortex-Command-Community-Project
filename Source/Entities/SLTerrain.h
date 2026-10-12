@@ -2,6 +2,7 @@
 
 #include "SceneLayer.h"
 #include "Matrix.h"
+#include "TerrainGenerator.h"
 
 namespace RTE {
 
@@ -78,6 +79,11 @@ namespace RTE {
 #pragma endregion
 
 #pragma region Getters and Setters
+		/// Gets whether this SLTerrain's material layer is generated procedurally instead of loaded from a file.
+		/// A generated terrain stops being generated once it has been saved, e.g. in a saved game, since it may have been changed since.
+		/// @return Whether this SLTerrain is generated procedurally.
+		bool IsProcedurallyGenerated() const { return m_ProceduralGenerator && m_BitmapFile.GetDataPath().empty(); }
+
 		/// Gets the width of this SLTerrain as determined by the main (material) bitmap.
 		/// @return The width of this SLTerrain, in pixels.
 		int GetWidth() const { return m_Width; }
@@ -224,6 +230,13 @@ namespace RTE {
 		std::deque<Box> m_UpdatedMaterialAreas; //!< List of areas of the material layer (main bitmap) which have been affected by new objects copied to it. These boxes are NOT wrapped, and can be out of bounds!
 
 		Directions m_OrbitDirection; //!< The direction of the out-of-bounds "orbit" for this scene, where the brain must path to and where dropships/rockets come from.
+
+		std::unique_ptr<TerrainGenerator> m_ProceduralGenerator; //!< Generates the material layer instead of loading it from the bitmap file, if set.
+		std::vector<int> m_GeneratedSurfaceHeights; //!< The surface height of each column of the last generated material layer, empty if it wasn't generated. Used to tell caves apart from the sky.
+
+		/// Generates the material layer if this SLTerrain is procedurally generated, otherwise loads it from the bitmap file.
+		/// @return A new material BITMAP. Ownership IS transferred!
+		BITMAP* LoadMainBitmap() override;
 
 		/// Applies Material textures to the foreground and background color layers, based on the loaded material layer (main bitmap).
 		void TexturizeTerrain();

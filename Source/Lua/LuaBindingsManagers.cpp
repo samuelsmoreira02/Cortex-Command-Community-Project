@@ -88,6 +88,8 @@ LuaBindingRegisterFunctionDefinitionForType(ManagerLuaBindings, FrameMan) {
 	    .def("FadeInPalette", &FrameMan::FadeInPalette)
 	    .def("FadeOutPalette", &FrameMan::FadeOutPalette)
 	    .def("SaveScreenToPNG", &FrameMan::SaveScreenToPNG)
+	    .def("SaveWorldToPNG", &FrameMan::SaveWorldToPNG)
+	    .def("SaveWorldPreviewToPNG", &FrameMan::SaveWorldPreviewToPNG)
 	    .def("SaveBitmapToPNG", &FrameMan::SaveBitmapToPNG)
 	    .def("FlashScreen", &FrameMan::FlashScreen)
 	    .def("CalculateTextHeight", &FrameMan::CalculateTextHeight)
@@ -307,6 +309,9 @@ LuaBindingRegisterFunctionDefinitionForType(ManagerLuaBindings, SceneMan) {
 
 	    .def("LoadScene", (int(SceneMan::*)(const std::string&, bool, bool)) & SceneMan::LoadScene)
 	    .def("LoadScene", (int(SceneMan::*)(const std::string&, bool)) & SceneMan::LoadScene)
+	    .def("SetSceneToLoad", (int(SceneMan::*)(const std::string&, bool, bool)) & SceneMan::SetSceneToLoad)
+	    .def("SetNextProceduralTerrainSeed", &SceneMan::SetNextProceduralTerrainSeed)
+	    .def("GetLastProceduralTerrainSeed", &SceneMan::GetLastProceduralTerrainSeed)
 
 	    .def("GetTerrain", &SceneMan::GetTerrain)
 	    .def("GetMaterial", &SceneMan::GetMaterial)

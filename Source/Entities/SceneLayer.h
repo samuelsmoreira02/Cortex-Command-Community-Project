@@ -250,6 +250,10 @@ namespace RTE {
 		/// @param player
 		void InitScrollRatios(bool initForNetworkPlayer = false, int player = Players::NoPlayer);
 
+		/// Creates the main bitmap for LoadData. Loads it from the bitmap file by default, derived layers can generate it instead.
+		/// @return A new main BITMAP. Ownership IS transferred!
+		virtual BITMAP* LoadMainBitmap() { return m_BitmapFile.GetAsBitmap(COLORCONV_NONE, false); }
+
 		/// Wraps or bounds a position coordinate if it is out of bounds of the SceneLayer, depending on the wrap settings of this SceneLayer.
 		/// @param pos The Vector coordinates of the position to wrap.
 		/// @param forceBounds Whether to attempt bounding or wrapping, or just wrapping.

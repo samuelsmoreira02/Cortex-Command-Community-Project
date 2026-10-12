@@ -114,6 +114,14 @@ namespace RTE {
 		/// @return The instance reference of the Scene, ownership IS NOT (!!) transferred!
 		const Scene* GetSceneToLoad() { return m_pSceneToLoad; }
 
+		/// Sets the seed the next procedurally generated terrain will use, instead of a random one, e.g. to generate a given terrain again.
+		/// @param seed The seed to use. 0 means random.
+		void SetNextProceduralTerrainSeed(unsigned int seed);
+
+		/// Gets the seed used by the most recently procedurally generated terrain.
+		/// @return The seed of the last generated terrain.
+		unsigned int GetLastProceduralTerrainSeed() const;
+
 		/// Gets whether objects are placed when the Scene is initially started. Used for saving/loading games.
 		/// @return Whether objects are placed when the Scene is initially started.
 		bool GetPlaceObjectsOnLoad() const { return m_PlaceObjects; }

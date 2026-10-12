@@ -8,6 +8,7 @@
 #include "PrimitiveMan.h"
 #include "SettingsMan.h"
 #include "Scene.h"
+#include "TerrainGenerator.h"
 #include "SLTerrain.h"
 #include "SLBackground.h"
 #include "TerrainObject.h"
@@ -169,6 +170,14 @@ int SceneMan::LoadScene(Scene* pNewScene, bool placeObjects, bool placeUnits) {
 	g_MovableMan.UpdateDrawMOIDs();
 
 	return 0;
+}
+
+void SceneMan::SetNextProceduralTerrainSeed(unsigned int seed) {
+	TerrainGenerator::SetNextSeed(seed);
+}
+
+unsigned int SceneMan::GetLastProceduralTerrainSeed() const {
+	return TerrainGenerator::GetLastSeed();
 }
 
 int SceneMan::SetSceneToLoad(const std::string& sceneName, bool placeObjects, bool placeUnits) {

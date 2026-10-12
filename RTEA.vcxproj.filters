@@ -565,6 +565,9 @@
     <ClInclude Include="Source\Entities\TerrainFrosting.h">
       <Filter>Entities</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Entities\TerrainGenerator.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Entities\SLBackground.h">
       <Filter>Entities</Filter>
     </ClInclude>
@@ -1167,6 +1170,9 @@
       <Filter>Lua</Filter>
     </ClCompile>
     <ClCompile Include="Source\Entities\TerrainFrosting.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Entities\TerrainGenerator.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="Source\Entities\SLBackground.cpp">

@@ -36,13 +36,20 @@ void SLTerrain::Clear() {
 	m_TerrainObjects.clear();
 	m_UpdatedMaterialAreas.clear();
 	m_OrbitDirection = Directions::Up;
+	m_ProceduralGenerator.reset();
+	m_GeneratedSurfaceHeights.clear();
 }
 
 int SLTerrain::Create() {
 	SceneLayer::Create();
 
-	m_Width = m_BitmapFile.GetImageWidth();
-	m_Height = m_BitmapFile.GetImageHeight();
+	if (IsProcedurallyGenerated()) {
+		m_Width = m_ProceduralGenerator->GetWidth();
+		m_Height = m_ProceduralGenerator->GetHeight();
+	} else {
+		m_Width = m_BitmapFile.GetImageWidth();
+		m_Height = m_BitmapFile.GetImageHeight();
+	}
 
 	if (!m_FGColorLayer.get()) {
 		m_FGColorLayer = std::make_unique<SceneLayer>();
@@ -83,6 +90,11 @@ int SLTerrain::Create(const SLTerrain& reference) {
 
 	m_OrbitDirection = reference.m_OrbitDirection;
 
+	if (reference.m_ProceduralGenerator) {
+		m_ProceduralGenerator = std::make_unique<TerrainGenerator>();
+		m_ProceduralGenerator->Create(*reference.m_ProceduralGenerator);
+	}
+
 	return 0;
 }
 
@@ -115,6 +127,10 @@ int SLTerrain::ReadProperty(const std::string_view& propName, Reader& reader) {
 		reader >> terrainObject.get();
 		m_TerrainObjects.emplace_back(terrainObject.release());
 	});
+	MatchProperty("ProceduralGenerator", {
+		m_ProceduralGenerator = std::make_unique<TerrainGenerator>();
+		reader >> m_ProceduralGenerator.get();
+	});
 	MatchProperty("OrbitDirection", {
 		std::string orbitDirection;
 		reader >> orbitDirection;
@@ -136,6 +152,11 @@ int SLTerrain::ReadProperty(const std::string_view& propName, Reader& reader) {
 
 int SLTerrain::Save(Writer& writer) const {
 	SceneLayer::Save(writer);
+
+	// Once the material layer has been saved to a file (e.g. in a saved game), it's loaded from there instead of generated again, since it may have changed since.
+	if (IsProcedurallyGenerated()) {
+		writer.NewPropertyWithValue("ProceduralGenerator", m_ProceduralGenerator.get());
+	}
 
 	// Only write the background texture info if the background itself is not saved out as a file already, since saved, pre-rendered bitmaps don't need texturing.
 	if (m_BGColorLayer->IsLoadedFromDisk()) {
@@ -185,6 +206,11 @@ int SLTerrain::Save(Writer& writer) const {
 }
 
 // TODO: Break this down and refactor.
+BITMAP* SLTerrain::LoadMainBitmap() {
+	m_GeneratedSurfaceHeights.clear();
+	return IsProcedurallyGenerated() ? m_ProceduralGenerator->Generate(m_WrapX, &m_GeneratedSurfaceHeights) : SceneLayer::LoadMainBitmap();
+}
+
 void SLTerrain::TexturizeTerrain() {
 	BITMAP* defaultBGLayerTexture = m_DefaultBGTextureFile.GetAsBitmap();
 
@@ -192,7 +218,9 @@ void SLTerrain::TexturizeTerrain() {
 	BITMAP* bgLayerTexture = m_BGColorLayer->GetBitmap();
 
 	const std::array<Material*, c_PaletteEntriesNumber>& materialPalette = g_SceneMan.GetMaterialPalette();
-	const std::array<unsigned char, c_PaletteEntriesNumber>& materialMappings = g_PresetMan.GetDataModule(m_BitmapFile.GetDataModuleID())->GetAllMaterialMappings();
+	// Generated terrain is made of material indices that are already resolved, so it never needs remapping.
+	static const std::array<unsigned char, c_PaletteEntriesNumber> noMaterialMappings{};
+	const std::array<unsigned char, c_PaletteEntriesNumber>& materialMappings = IsProcedurallyGenerated() ? noMaterialMappings : g_PresetMan.GetDataModule(m_BitmapFile.GetDataModuleID())->GetAllMaterialMappings();
 
 	std::array<BITMAP*, c_PaletteEntriesNumber> materialFGTextures;
 	materialFGTextures.fill(nullptr);
@@ -251,7 +279,9 @@ void SLTerrain::TexturizeTerrain() {
 			              _putpixel(fgLayerTexture, xPos, yPos, fgPixelColor);
 
 			              int bgPixelColor = 0;
-			              if (matIndex == 0) {
+			              // Generated caves are air below the surface, which should show the background like dug out tunnels do, not the sky.
+			              bool isGeneratedCave = !m_GeneratedSurfaceHeights.empty() && yPos > m_GeneratedSurfaceHeights[xPos];
+			              if (matIndex == 0 && !isGeneratedCave) {
 				              bgPixelColor = ColorKeys::g_MaskColor;
 			              } else {
 				              if (!bgTexture) {
