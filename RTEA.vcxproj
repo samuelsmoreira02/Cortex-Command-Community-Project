@@ -755,6 +755,7 @@
     <ClInclude Include="Source\Entities\SoundSet.h" />
     <ClInclude Include="Source\Entities\TerrainFrosting.h" />
     <ClInclude Include="Source\Entities\TerrainGenerator.h" />
+    <ClInclude Include="Source\Entities\TerrainFire.h" />
     <ClInclude Include="Source\GUI\GUIInterface.h" />
     <ClInclude Include="Source\GUI\GUIReader.h" />
     <ClInclude Include="Source\GUI\GUISound.h" />
@@ -1024,6 +1025,7 @@
     <ClCompile Include="Source\Entities\SoundSet.cpp" />
     <ClCompile Include="Source\Entities\TerrainFrosting.cpp" />
     <ClCompile Include="Source\Entities\TerrainGenerator.cpp" />
+    <ClCompile Include="Source\Entities\TerrainFire.cpp" />
     <ClCompile Include="Source\GUI\GUIReader.cpp" />
     <ClCompile Include="Source\GUI\GUISound.cpp" />
     <ClCompile Include="Source\GUI\GUIWriter.cpp" />

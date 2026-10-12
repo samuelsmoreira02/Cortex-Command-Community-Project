@@ -50,6 +50,7 @@ sources += files(
 'TerrainDebris.cpp',
 'TerrainFrosting.cpp',
 'TerrainGenerator.cpp',
+'TerrainFire.cpp',
 'TerrainObject.cpp',
 'ThrownDevice.cpp',
 'Turret.cpp',

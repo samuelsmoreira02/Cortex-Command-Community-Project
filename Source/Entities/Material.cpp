@@ -20,6 +20,9 @@ void Material::Clear() {
 	m_SettleMaterialIndex = 0;
 	m_SpawnMaterialIndex = 0;
 	m_IsScrap = false;
+	m_Flammability = 0.0F;
+	m_BurnTimeMS = 3000;
+	m_BurnsIntoIndex = 0;
 	m_Color.Reset();
 	m_UseOwnColor = false;
 	m_FGTextureFile.Reset();
@@ -45,6 +48,9 @@ int Material::Create(const Material& reference) {
 	m_SettleMaterialIndex = reference.m_SettleMaterialIndex;
 	m_SpawnMaterialIndex = reference.m_SpawnMaterialIndex;
 	m_IsScrap = reference.m_IsScrap;
+	m_Flammability = reference.m_Flammability;
+	m_BurnTimeMS = reference.m_BurnTimeMS;
+	m_BurnsIntoIndex = reference.m_BurnsIntoIndex;
 	m_Color = reference.m_Color;
 	m_UseOwnColor = reference.m_UseOwnColor;
 	m_FGTextureFile = reference.m_FGTextureFile;
@@ -86,6 +92,9 @@ int Material::ReadProperty(const std::string_view& propName, Reader& reader) {
 	MatchProperty("SettleMaterial", { reader >> m_SettleMaterialIndex; });
 	MatchForwards("SpawnMaterial") MatchProperty("TransformsInto", { reader >> m_SpawnMaterialIndex; });
 	MatchProperty("IsScrap", { reader >> m_IsScrap; });
+	MatchProperty("Flammability", { reader >> m_Flammability; });
+	MatchProperty("BurnTime", { reader >> m_BurnTimeMS; });
+	MatchProperty("BurnsInto", { reader >> m_BurnsIntoIndex; });
 	MatchProperty("Color", { reader >> m_Color; });
 	MatchProperty("UseOwnColor", { reader >> m_UseOwnColor; });
 	MatchProperty("FGTextureFile", {
@@ -116,6 +125,9 @@ int Material::Save(Writer& writer) const {
 		writer.NewPropertyWithValue("SettleMaterial", m_SettleMaterialIndex);
 		writer.NewPropertyWithValue("SpawnMaterial", m_SpawnMaterialIndex);
 		writer.NewPropertyWithValue("IsScrap", m_IsScrap);
+		writer.NewPropertyWithValue("Flammability", m_Flammability);
+		writer.NewPropertyWithValue("BurnTime", m_BurnTimeMS);
+		writer.NewPropertyWithValue("BurnsInto", m_BurnsIntoIndex);
 		writer.NewPropertyWithValue("Color", m_Color);
 		writer.NewPropertyWithValue("UseOwnColor", m_UseOwnColor);
 		writer.NewPropertyWithValue("FGTextureFile", m_FGTextureFile);

@@ -319,6 +319,9 @@ LuaBindingRegisterFunctionDefinitionForType(ManagerLuaBindings, SceneMan) {
 	    .def("SetSceneToLoad", (int(SceneMan::*)(const std::string&, bool, bool)) & SceneMan::SetSceneToLoad)
 	    .def("SetNextProceduralTerrainSeed", &SceneMan::SetNextProceduralTerrainSeed)
 	    .def("GetLastProceduralTerrainSeed", &SceneMan::GetLastProceduralTerrainSeed)
+	    .def("IgniteTerrain", &SceneMan::IgniteTerrain)
+	    .def("ExtinguishTerrain", &SceneMan::ExtinguishTerrain)
+	    .def("GetBurningTerrainPixelCount", &SceneMan::GetBurningTerrainPixelCount)
 
 	    .def("GetTerrain", &SceneMan::GetTerrain)
 	    .def("GetMaterial", &SceneMan::GetMaterial)

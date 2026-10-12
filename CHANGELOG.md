@@ -31,6 +31,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - New global script "Dynamic Weather". Rain, or snow on snowy scenes, comes and goes using the existing weather effects, darkening the sky while it lasts. Deserts stay dry.
 
+- Burning terrain.  
+	Fire now spreads through flammable terrain, climbing faster than it creeps down, flickering and giving off flames that burn whatever they touch. Once a pixel has burnt for long enough it turns into another material, or burns away into air, and pathfinding is updated to match. Only burning pixels are tracked, so terrain that isn't on fire costs nothing. Flamethrower, napalm and incendiary flames set the terrain they land on alight. Grass, vegetation and oil burn away, and wood burns into ashes.  
+	New `Material` INI properties `Flammability` (0 to 1, 0 by default, which never burns), `BurnTime` (in milliseconds, 3000 by default) and `BurnsInto` (the material index it turns into, air by default).  
+	New Lua functions `SceneMan:IgniteTerrain(pos, radius)`, `SceneMan:ExtinguishTerrain(pos, radius)` (both return how many pixels were affected) and `SceneMan:GetBurningTerrainPixelCount()`.
+
 - New Lua functions `SceneMan:SetNextProceduralTerrainSeed(seed)`, `SceneMan:GetLastProceduralTerrainSeed()`, `SceneMan:SetSceneToLoad(sceneName, placeObjects, placeUnits)`, `ActivityMan:SetRestartActivity(restart)`, `FrameMan:SaveWorldToPNG(nameBase)` and `FrameMan:SaveWorldPreviewToPNG(nameBase)`.
 
 - Pathfinding and navigation overhaul, including jetpack/jump-aware pathfinding.  

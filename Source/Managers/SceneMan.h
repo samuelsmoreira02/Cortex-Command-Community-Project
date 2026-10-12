@@ -122,6 +122,22 @@ namespace RTE {
 		/// @return The seed of the last generated terrain.
 		unsigned int GetLastProceduralTerrainSeed() const;
 
+		/// Sets the flammable terrain within a radius on fire. Only pixels of materials with a Flammability above 0 catch fire.
+		/// @param pos The center of the area, in scene coordinates.
+		/// @param radius The radius of the area, in pixels.
+		/// @return How many pixels caught fire.
+		int IgniteTerrain(const Vector& pos, float radius);
+
+		/// Puts out burning terrain within a radius.
+		/// @param pos The center of the area, in scene coordinates.
+		/// @param radius The radius of the area, in pixels.
+		/// @return How many pixels were put out.
+		int ExtinguishTerrain(const Vector& pos, float radius);
+
+		/// Gets how many terrain pixels are on fire.
+		/// @return The number of burning terrain pixels.
+		int GetBurningTerrainPixelCount() const;
+
 		/// Gets whether objects are placed when the Scene is initially started. Used for saving/loading games.
 		/// @return Whether objects are placed when the Scene is initially started.
 		bool GetPlaceObjectsOnLoad() const { return m_PlaceObjects; }

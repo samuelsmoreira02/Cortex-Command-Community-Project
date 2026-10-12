@@ -37,6 +37,8 @@ function SyncedUpdate(self)
 end
 
 function OnCollideWithTerrain(self, terrainID)
+	-- Set flammable terrain around the flame on fire.
+	SceneMan:IgniteTerrain(self.Pos, 4);
 	if (self.Vel + self.PrevVel):MagnitudeIsLessThan(1) then
 		local checkPos = self.Pos + Vector(math.random(-1, 1), math.random(-1, 1));
 		if SceneMan:GetTerrMatter(checkPos.X, checkPos.Y) == rte.grassID then

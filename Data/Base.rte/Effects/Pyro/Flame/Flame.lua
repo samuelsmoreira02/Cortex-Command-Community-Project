@@ -87,6 +87,8 @@ function OnCollideWithMO(self, mo, rootMO)
 end
 
 function OnCollideWithTerrain(self, terrainID)
+	-- Set flammable terrain around the flame on fire.
+	SceneMan:IgniteTerrain(self.Pos, 3);
 	if self.grassInteraction and terrainID == rte.grassID then
 		local newFlame = CreatePEmitter("Ground Flame", "Base.rte");
 		newFlame.Pos = self.Pos;

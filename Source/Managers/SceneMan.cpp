@@ -180,6 +180,18 @@ unsigned int SceneMan::GetLastProceduralTerrainSeed() const {
 	return TerrainGenerator::GetLastSeed();
 }
 
+int SceneMan::IgniteTerrain(const Vector& pos, float radius) {
+	return m_pCurrentScene ? m_pCurrentScene->GetTerrainFire().Ignite(m_pCurrentScene->GetTerrain(), pos, radius) : 0;
+}
+
+int SceneMan::ExtinguishTerrain(const Vector& pos, float radius) {
+	return m_pCurrentScene ? m_pCurrentScene->GetTerrainFire().Extinguish(pos, radius) : 0;
+}
+
+int SceneMan::GetBurningTerrainPixelCount() const {
+	return m_pCurrentScene ? m_pCurrentScene->GetTerrainFire().GetBurningPixelCount() : 0;
+}
+
 int SceneMan::SetSceneToLoad(const std::string& sceneName, bool placeObjects, bool placeUnits) {
 	// Use the name passed in to load the preset requested
 	const Scene* pSceneRef = dynamic_cast<const Scene*>(g_PresetMan.GetEntityPreset("Scene", sceneName));

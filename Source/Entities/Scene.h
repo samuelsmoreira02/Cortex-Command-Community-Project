@@ -10,6 +10,7 @@
 #include "Activity.h"
 #include "PathFinder.h"
 #include "SceneLayer.h"
+#include "TerrainFire.h"
 
 #include <array>
 #include <map>
@@ -683,6 +684,10 @@ namespace RTE {
 		/// before drawing.
 		void Update();
 
+		/// Gets the fire burning through this Scene's terrain.
+		/// @return The terrain fire.
+		TerrainFire& GetTerrainFire() { return m_TerrainFire; }
+
 		/// Whether this scene is a temprorary metagame scene and should
 		/// not be used anywhere except in metagame.
 		/// @return Whether scene belongs to metagame or not.
@@ -746,6 +751,8 @@ namespace RTE {
 		std::array<std::unique_ptr<PathFinder>, Activity::Teams::MaxTeamCount + 1> m_pPathFinders;
 		// Is set to true on any frame the pathfinding data has been updated
 		bool m_PathfindingUpdated;
+		// The fire burning through the terrain.
+		TerrainFire m_TerrainFire;
 		// Timer for when to do an update of the pathfinding data
 		Timer m_PartialPathUpdateTimer;
 

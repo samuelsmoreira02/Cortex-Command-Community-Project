@@ -104,6 +104,18 @@ namespace RTE {
 		/// @return Whether this material is scrap material.
 		bool IsScrap() const { return m_IsScrap; }
 
+		/// Gets how easily terrain of this material catches fire from burning terrain next to it, from 0 (never) to 1.
+		/// @return The flammability of this material.
+		float GetFlammability() const { return m_Flammability; }
+
+		/// Gets how long terrain of this material burns before it burns out, in milliseconds.
+		/// @return The burn time of this material.
+		int GetBurnTimeMS() const { return m_BurnTimeMS; }
+
+		/// Gets the index of the material terrain of this material turns into once burnt out. 0 is air, so it's burnt away.
+		/// @return The index of the material this burns into.
+		unsigned char GetBurnsIntoIndex() const { return m_BurnsIntoIndex; }
+
 		/// Gets the Color of this Material.
 		/// @return The color of this material.
 		Color GetColor() const { return m_Color; }
@@ -152,6 +164,10 @@ namespace RTE {
 		unsigned char m_SettleMaterialIndex; //!< The material to turn particles of this into when they settle on the terrain. 0 here means to spawn this material.
 		unsigned char m_SpawnMaterialIndex; //!< The material to spawn instead of this one for special effects, etc. 0 here means to spawn this material.
 		bool m_IsScrap; //!< Whether this material is scrap material made from gibs of things that have already been blown apart.
+
+		float m_Flammability; //!< How easily terrain of this material catches fire from burning terrain next to it, from 0 (never) to 1.
+		int m_BurnTimeMS; //!< How long terrain of this material burns before it burns out, in milliseconds.
+		unsigned char m_BurnsIntoIndex; //!< The index of the material terrain of this material turns into once burnt out. 0 is air.
 
 		Color m_Color; //!< The natural color of this material.
 		bool m_UseOwnColor; //!< Whether or not to use the own color when a pixel of this material is knocked loose from the terrain. If 0, then the terrain pixel's color will be applied instead.
