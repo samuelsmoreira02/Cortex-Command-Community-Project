@@ -36,6 +36,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 	New `Material` INI properties `Flammability` (0 to 1, 0 by default, which never burns), `BurnTime` (in milliseconds, 3000 by default) and `BurnsInto` (the material index it turns into, air by default).  
 	New Lua functions `SceneMan:IgniteTerrain(pos, radius)`, `SceneMan:ExtinguishTerrain(pos, radius)` (both return how many pixels were affected) and `SceneMan:GetBurningTerrainPixelCount()`.
 
+- New global script "Colorblind Team Markers". Marks every unit with a symbol above its head that shows its team by shape as well as color: a blue circle, an orange square, a yellow triangle or a light blue diamond. The colors stay distinguishable with red-green and blue-yellow colorblindness.
+
+- New global script "Photo Mode". Press F8 to hide the HUD, slow the game to a near stop, freeze the unit you control and fly the camera around with the arrow keys or WASD (hold Shift to go faster). Take pictures with F12. Press F8 again to go back to the game.
+
 - New global script "Veterans".  
 	Soldiers on human players' teams become persistent veterans, kept in `UserSavedGames.rte/VeteranRoster.txt` across games. Each gets a name, earns experience from kills (25), finished missions (50) and victories (50), and climbs from Recruit through Private, Corporal, Sergeant and Lieutenant to Captain, gaining health and perceptiveness on the way. From Corporal on, every promotion grants a trait: Tough (+25% health), Eagle Eye (spots enemies from further away), Field Medic (slowly heals) or Iron Nerves (shrugs off impacts). Soldiers who get badly hurt during a mission carry a permanent scar, losing 10% health for each. Buying a unit brings back the best available veteran trained on it, and the fallen are remembered on a memorial. Promotions and deaths are announced on screen, veterans' names and ranks are shown above them, and the roster and memorial can be checked from the new "Veteran Roster" pie slice.
 
