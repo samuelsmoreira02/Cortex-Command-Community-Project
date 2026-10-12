@@ -494,6 +494,15 @@ namespace RTE {
 				return 0;
 		}
 
+		/// Records that an Actor died, so it can be told apart from Actors that were removed some other way, like leaving in a craft.
+		/// @param uniqueID The UniqueID of the Actor that died.
+		void RegisterActorDeath(long uniqueID) { m_DeadActorIDs.insert(uniqueID); }
+
+		/// Gets whether an Actor has died since the last time all MOs were purged, even if it has since been deleted.
+		/// @param uniqueID The UniqueID of the Actor to check.
+		/// @return Whether the Actor died.
+		bool HasActorDied(long uniqueID) const { return m_DeadActorIDs.contains(uniqueID); }
+
 		/// Returns the size of the object registry collection
 		/// @return Size of the objects registry.
 		unsigned int GetKnownObjectsCount() { return m_KnownObjects.size(); }
@@ -636,6 +645,7 @@ namespace RTE {
 
 		// Global map which stores all objects so they could be foud by their unique ID
 		std::map<long int, MovableObject*> m_KnownObjects;
+		std::unordered_set<long> m_DeadActorIDs; //!< The UniqueIDs of the Actors that died since all MOs were last purged.
 
 		/// Private member variable and method declarations
 	private:

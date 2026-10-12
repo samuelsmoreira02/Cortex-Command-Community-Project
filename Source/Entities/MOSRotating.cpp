@@ -10,6 +10,7 @@
 #include "AEmitter.h"
 #include "Attachable.h"
 #include "HDFirearm.h"
+#include "Actor.h"
 #include "SoundContainer.h"
 #include "PostProcessMan.h"
 #include "FrameMan.h"
@@ -648,6 +649,13 @@ bool MOSRotating::CollideAtPoint(HitData& hd) {
 		return false; // TODO: Add a settings flag to enable old school particle sponges!
 	}
 
+	// Remember who hit this, so they get the credit if it dies.
+	if (const long sourceActorID = hd.Body[HITOR] ? hd.Body[HITOR]->GetSourceActorID() : 0; sourceActorID != 0) {
+		if (Actor* hitActor = dynamic_cast<Actor*>(GetRootParent()); hitActor && !hitActor->IsStatus(Actor::DYING) && !hitActor->IsDead() && hitActor->GetUniqueID() != sourceActorID) {
+			hitActor->SetLastAttackerID(sourceActorID);
+		}
+	}
+
 	hd.ResImpulse[HITOR].Reset();
 	hd.ResImpulse[HITEE].Reset();
 
@@ -976,6 +984,8 @@ void MOSRotating::CreateGibsWhenGibbing(const Vector& impactImpulse, MovableObje
 				gibParticleClone->SetRotAngle(gibVelocity.GetAbsRadAngle() + (m_HFlipped ? c_PI : 0));
 				gibParticleClone->SetAngularVel((gibParticleClone->GetAngularVel() * 0.35F) + (gibParticleClone->GetAngularVel() * 0.65F / mass) * RandomNum());
 				gibParticleClone->SetVel(gibVelocity + ((m_PrevVel + m_Vel) / 2) * gibSettingsObject->InheritsVelocity());
+				// Hits from the gibs are credited to whoever was responsible for this, like the Actor that threw this grenade.
+				gibParticleClone->SetSourceActorID(m_SourceActorID);
 				if (movableObjectToIgnore) {
 					gibParticleClone->SetWhichMOToNotHit(movableObjectToIgnore);
 				}
@@ -1034,6 +1044,8 @@ void MOSRotating::CreateGibsWhenGibbing(const Vector& impactImpulse, MovableObje
 
 				gibParticleClone->SetVel(gibVelocity + ((m_PrevVel + m_Vel) / 2) * gibSettingsObject->InheritsVelocity());
 
+				// Hits from the gibs are credited to whoever was responsible for this, like the Actor that threw this grenade.
+				gibParticleClone->SetSourceActorID(m_SourceActorID);
 				if (movableObjectToIgnore) {
 					gibParticleClone->SetWhichMOToNotHit(movableObjectToIgnore);
 				}

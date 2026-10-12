@@ -58,6 +58,7 @@ void MovableObject::Clear() {
 	m_HitsMOs = false;
 	m_pMOToNotHit = 0;
 	m_MOIgnoreTimer.Reset();
+	m_SourceActorID = 0;
 	m_GetsHitByMOs = false;
 	m_IgnoresTeamHits = false;
 	m_IgnoresAtomGroupHits = false;
@@ -220,6 +221,7 @@ int MovableObject::Create(const MovableObject& reference) {
 	m_IgnoresActorHits = reference.m_IgnoresActorHits;
 	m_pMOToNotHit = reference.m_pMOToNotHit;
 	m_MOIgnoreTimer = reference.m_MOIgnoreTimer;
+	m_SourceActorID = reference.m_SourceActorID;
 	m_MissionCritical = reference.m_MissionCritical;
 	m_CanBeSquished = reference.m_CanBeSquished;
 	m_HUDVisible = reference.m_HUDVisible;

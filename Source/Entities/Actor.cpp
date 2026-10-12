@@ -71,6 +71,9 @@ void Actor::Clear() {
 	m_HeartBeat.Reset();
 	m_NewControlTmr.Reset();
 	m_DeathTmr.Reset();
+	m_LastAttackerID = 0;
+	m_Kills = 0;
+	m_DeathCredited = false;
 	m_GoldCarried = 0;
 	m_GoldPicked = false;
 	m_AimState = AIMSTILL;
@@ -193,6 +196,7 @@ int Actor::Create(const Actor& reference) {
 	m_Status = reference.m_Status;
 	m_Health = m_PrevHealth = reference.m_Health;
 	m_MaxHealth = reference.m_MaxHealth;
+	m_Kills = reference.m_Kills;
 	m_pTeamIcon = reference.m_pTeamIcon;
 	//    m_LastSecondTimer.Reset();
 	//    m_LastSecondPos.Reset();
@@ -867,7 +871,23 @@ bool Actor::AddToInventoryBack(MovableObject* itemToAdd) {
 	return true;
 }
 
+void Actor::CreditKiller() {
+	if (m_DeathCredited) {
+		return;
+	}
+	m_DeathCredited = true;
+	g_MovableMan.RegisterActorDeath(GetUniqueID());
+	if (m_LastAttackerID != 0 && m_LastAttackerID != GetUniqueID()) {
+		if (Actor* killer = dynamic_cast<Actor*>(g_MovableMan.FindObjectByUniqueID(m_LastAttackerID)); killer && killer->GetTeam() != m_Team) {
+			killer->m_Kills++;
+		}
+	}
+}
+
 void Actor::GibThis(const Vector& impactImpulse, MovableObject* movableObjectToIgnore) {
+	// Gibbing kills outright, so whoever hit this last gets the credit even if it never got around to dying the normal way.
+	CreditKiller();
+
 	// Play death sound
 	// TODO: Don't attenuate since death is pretty important.. maybe only make this happen for teh brains
 	if (m_DeathSound) {
@@ -1237,6 +1257,7 @@ void Actor::Update() {
 
 	// Prevent dead actors from rotating like mad
 	if (m_Status == DYING || m_Status == DEAD) {
+		CreditKiller();
 		m_AngularVel = m_AngularVel * 0.98F;
 	}
 

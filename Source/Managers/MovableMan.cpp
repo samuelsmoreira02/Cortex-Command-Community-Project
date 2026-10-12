@@ -204,6 +204,7 @@ const std::vector<MovableObject*>* MovableMan::GetMOsAtPosition(int pixelX, int 
 }
 
 void MovableMan::PurgeAllMOs() {
+	m_DeadActorIDs.clear();
 	for (std::deque<Actor*>::iterator itr = m_Actors.begin(); itr != m_Actors.end(); ++itr) {
 		(*itr)->DestroyScriptState();
 	}

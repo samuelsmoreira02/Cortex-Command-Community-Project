@@ -355,6 +355,22 @@ namespace RTE {
 		/// @param setHealth A float specifying the value to set to.
 		void SetHealth(const float setHealth) { m_Health = setHealth; }
 
+		/// Gets the UniqueID of the Actor that last hit this Actor, which gets credited with the kill if this Actor dies.
+		/// @return The UniqueID of the Actor that last hit this, or 0 if none has.
+		long GetLastAttackerID() const { return m_LastAttackerID; }
+
+		/// Sets the UniqueID of the Actor that last hit this Actor, which gets credited with the kill if this Actor dies.
+		/// @param attackerID The UniqueID of the attacking Actor, or 0 for none.
+		void SetLastAttackerID(long attackerID) { m_LastAttackerID = attackerID; }
+
+		/// Gets how many enemy Actors this Actor has killed.
+		/// @return The number of kills.
+		int GetKills() const { return m_Kills; }
+
+		/// Sets how many enemy Actors this Actor has killed.
+		/// @param kills The number of kills.
+		void SetKills(int kills) { m_Kills = kills; }
+
 		/// Checks if this Actor is in a specific status.
 		/// @param which Which status to check for.
 		/// @return A bool with the answer.
@@ -919,6 +935,12 @@ namespace RTE {
 		Timer m_NewControlTmr;
 		// Death timing timer
 		Timer m_DeathTmr;
+		long m_LastAttackerID; //!< The UniqueID of the Actor that last hit this, or 0 if none has.
+		int m_Kills; //!< How many enemy Actors this has killed.
+		bool m_DeathCredited; //!< Whether this Actor's killer has already been credited with the kill.
+
+		/// Credits the Actor that last hit this one with killing it, once.
+		void CreditKiller();
 		// Amount of Gold carried, in ounces.
 		float m_GoldCarried;
 		// Whether or not any gold was picked up this frame.

@@ -1894,6 +1894,8 @@ void AHuman::PreControllerUpdate() {
 						pMO->SetAngularVel(m_AngularVel + RandomNum(-5.0F, 2.5F) * GetFlipFactor());
 						pMO->SetRotAngle(adjustedAimAngle);
 
+						// Credit what the thrown device does to this Actor.
+						pMO->SetSourceActorID(GetUniqueID());
 						if (HeldDevice* moAsHeldDevice = dynamic_cast<HeldDevice*>(pMO)) {
 							moAsHeldDevice->SetTeam(m_Team);
 							moAsHeldDevice->SetIgnoresTeamHits(true);

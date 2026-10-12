@@ -501,6 +501,14 @@ namespace RTE {
 			m_MOIgnoreTimer.SetSimTimeLimitS(forHowLong);
 		}
 
+		/// Gets the UniqueID of the Actor responsible for this MO, like the Actor that fired this bullet or threw this grenade. Hits from this MO are credited to that Actor.
+		/// @return The UniqueID of the responsible Actor, or 0 if there's none.
+		long GetSourceActorID() const { return m_SourceActorID; }
+
+		/// Sets the UniqueID of the Actor responsible for this MO, like the Actor that fired this bullet or threw this grenade. Hits from this MO are credited to that Actor.
+		/// @param sourceActorID The UniqueID of the responsible Actor, or 0 for none.
+		void SetSourceActorID(long sourceActorID) { m_SourceActorID = sourceActorID; }
+
 		/// Enables or disables double drawing of this across wrapping seams.
 		/// @param wrapDraw Wheter to enable or not. (default: true)
 		void SetWrapDoubleDrawing(bool wrapDraw = true) { m_WrapDoubleDraw = wrapDraw; }
@@ -1183,6 +1191,7 @@ namespace RTE {
 		MovableObject* m_pMOToNotHit;
 		// For how long to not hit specific MO above
 		Timer m_MOIgnoreTimer;
+		long m_SourceActorID; //!< The UniqueID of the Actor responsible for this MO, like the Actor that fired this bullet or threw this grenade, or 0 if there's none.
 		// Whether or not this MovableObject can get hit by other MOs.
 		bool m_GetsHitByMOs;
 		// Whether this ignores collisions with other MOs of the same Team as this.

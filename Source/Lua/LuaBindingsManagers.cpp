@@ -128,6 +128,7 @@ LuaBindingRegisterFunctionDefinitionForType(ManagerLuaBindings, MovableMan) {
 
 	    .def("GetMOFromID", &MovableMan::GetMOFromID)
 	    .def("FindObjectByUniqueID", &MovableMan::FindObjectByUniqueID)
+	    .def("HasActorDied", &MovableMan::HasActorDied)
 	    .def("GetMOIDCount", &MovableMan::GetMOIDCount)
 	    .def("GetTeamMOIDCount", &MovableMan::GetTeamMOIDCount)
 	    .def("PurgeAllMOs", &MovableMan::PurgeAllMOs)

@@ -782,6 +782,9 @@ void HDFirearm::Update() {
 
 					// Set the team so alarm events that happen if these gib won't freak out the guy firing
 					pParticle->SetTeam(m_Team);
+					// Credit hits to the Actor firing this, or to whoever this gun's own shots are credited to if nobody's holding it.
+					const Actor* firingActor = dynamic_cast<const Actor*>(GetRootParent());
+					pParticle->SetSourceActorID(firingActor ? firingActor->GetUniqueID() : m_SourceActorID);
 
 					// Also make this not hit team members
 					// TODO: Don't hardcode this???

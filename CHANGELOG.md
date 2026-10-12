@@ -36,6 +36,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 	New `Material` INI properties `Flammability` (0 to 1, 0 by default, which never burns), `BurnTime` (in milliseconds, 3000 by default) and `BurnsInto` (the material index it turns into, air by default).  
 	New Lua functions `SceneMan:IgniteTerrain(pos, radius)`, `SceneMan:ExtinguishTerrain(pos, radius)` (both return how many pixels were affected) and `SceneMan:GetBurningTerrainPixelCount()`.
 
+- New global script "Veterans".  
+	Soldiers on human players' teams become persistent veterans, kept in `UserSavedGames.rte/VeteranRoster.txt` across games. Each gets a name, earns experience from kills (25), finished missions (50) and victories (50), and climbs from Recruit through Private, Corporal, Sergeant and Lieutenant to Captain, gaining health and perceptiveness on the way. From Corporal on, every promotion grants a trait: Tough (+25% health), Eagle Eye (spots enemies from further away), Field Medic (slowly heals) or Iron Nerves (shrugs off impacts). Soldiers who get badly hurt during a mission carry a permanent scar, losing 10% health for each. Buying a unit brings back the best available veteran trained on it, and the fallen are remembered on a memorial. Promotions and deaths are announced on screen, veterans' names and ranks are shown above them, and the roster and memorial can be checked from the new "Veteran Roster" pie slice.
+
+- Kill tracking.  
+	Bullets, shells and thrown devices now remember the Actor that fired or threw them, and so do the gibs of whatever they blow up, so kills are credited to the right Actor even when made with grenades or rockets.  
+	New `MovableObject` Lua property `SourceActorID` (R/W), the UniqueID of the Actor responsible for it.  
+	New `Actor` Lua properties `LastAttackerID` (R/W), the UniqueID of the Actor that last hit it, and `Kills` (R/W), how many enemy Actors it has killed.  
+	New Lua function `MovableMan:HasActorDied(uniqueID)`, which tells whether an Actor died, even after it has been deleted, so dying can be told apart from leaving in a craft.
+
 - Structural collapse.  
 	Terrain that loses its connection to the ground now falls, instead of floating in midair. Whenever terrain is shot, blown up, dug, erased or burnt away, the terrain around it is checked, and pieces that no longer connect to the bottom of the scene (or its sides, if it doesn't wrap) come down. Tiny pieces crumble into loose particles. Bigger ones fall as rigid chunks that keep every pixel's material and color, crush the actors under them, and settle where they land with a rumble, a cloud of dust and some screen shake. Falling chunks are still terrain, so they can be shot and dug through on the way down. Only terrain around removed terrain is checked, and pieces bigger than 40000 pixels are considered supported, so this stays cheap.  
 	New `Settings.ini` property `StructuralCollapse` (true by default) to turn it off, also available as the Lua property `SceneMan.StructuralCollapse` (R/W), and new Lua function `SceneMan:GetFallingTerrainChunkCount()`.  
