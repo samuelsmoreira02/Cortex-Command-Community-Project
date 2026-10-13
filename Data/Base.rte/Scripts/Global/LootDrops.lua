@@ -48,6 +48,12 @@ function LootDropsScript:StartScript()
 		{"HDFirearm", "Cryo Projector", "Base.rte"},
 		{"TDExplosive", "Singularity Grenade", "Base.rte"},
 		{"TDExplosive", "Airstrike Beacon", "Base.rte"},
+		{"HDFirearm", "Gravity Gun", "Base.rte"},
+		{"HDFirearm", "Tunneler", "Base.rte"},
+		{"HDFirearm", "Chakram Launcher", "Base.rte"},
+		{"HDFirearm", "Plasma Cutter", "Base.rte"},
+		{"TDExplosive", "Sentry Deployer", "Base.rte"},
+		{"TDExplosive", "Tesla Trap", "Base.rte"},
 	};
 
 	self.pickupSound = CreateSoundContainer("Loot Pickup", "Base.rte");

@@ -325,8 +325,26 @@ SDL_Palette* ContentFile::DefaultPaletteToSDL(bool preMask) {
 	return palette;
 }
 
+std::string ContentFile::GetImageOverridePath(const std::string& dataPath) {
+	static const std::string overrideDirectory = System::GetUserdataDirectory() + "SpriteOverrides/";
+	// Most players have no overrides at all, so don't look for each image's override unless the folder exists.
+	static const bool overridesExist = std::filesystem::is_directory(overrideDirectory);
+	if (!overridesExist) {
+		return dataPath;
+	}
+	std::string pathInModule = dataPath;
+	for (const std::string& topDirectory: {System::GetDataDirectory(), System::GetModDirectory()}) {
+		if (pathInModule.starts_with(topDirectory)) {
+			pathInModule = pathInModule.substr(topDirectory.length());
+			break;
+		}
+	}
+	const std::string overridePath = overrideDirectory + pathInModule;
+	return std::filesystem::exists(overridePath) ? overridePath : dataPath;
+}
+
 SDL_Surface* ContentFile::LoadImageAsSurface(int conversionMode, const std::string& dataPathToLoad) {
-	SDL_Surface* image = IMG_Load(dataPathToLoad.c_str());
+	SDL_Surface* image = IMG_Load(GetImageOverridePath(dataPathToLoad).c_str());
 	bool convert8To32 = conversionMode & COLORCONV_8_TO_32;
 	bool convertTo8 = conversionMode & COLORCONV_REDUCE_TO_256;
 	int bitDepth = SDL_GetPixelFormatDetails(image->format)->bits_per_pixel;

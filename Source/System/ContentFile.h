@@ -222,6 +222,12 @@ namespace RTE {
 		/// @return Pointer to the SDL_Surface loaded from disk.
 		static SDL_Surface* LoadImageAsSurface(int conversionMode, const std::string& dataPathToLoad);
 
+		/// Gets the path of the local override of an image, if there is one, so art that can't be shared (like art from other people's mods, used with their permission or just for personal play) can be used without adding it to the game's files.
+		/// An image at the same path under Userdata/SpriteOverrides/ is used instead of the original, e.g. Userdata/SpriteOverrides/Base.rte/Devices/Gun000.png instead of Data/Base.rte/Devices/Gun000.png.
+		/// @param dataPath The path of the original image.
+		/// @return The path of the override if there is one, otherwise the original path.
+		static std::string GetImageOverridePath(const std::string& dataPath);
+
 		/// Loads and transfers the data represented by this ContentFile object as an Allegro BITMAP. Ownership of the BITMAP IS transferred!
 		/// Note that this is relatively slow since it reads the data from disk each time.
 		/// @param conversionMode The Allegro color conversion mode to use when loading this bitmap. Only applies the first time a bitmap is loaded from the disk.

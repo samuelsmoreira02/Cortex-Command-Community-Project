@@ -45,6 +45,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 	**Singularity Grenade**: hovers and drags in units, items and the ground around it, then detonates in the middle of it all.  
 	**Airstrike Beacon**: marks a spot with a red laser and beeps, then six rockets fall from the sky around it.
 
+- Arsenal II: six more weapons in Base, also buyable by every faction and dropped as legendary loot.  
+	**Gravity Gun**: hold fire to grab the nearest unit, item or piece of debris in front of you and hold it in the air, let go to fling it.  
+	**Tunneler**: a drilling missile that bores straight through the ground, leaving a tunnel, and blows up when it touches an enemy or runs out of fuel.  
+	**Chakram Launcher**: a spinning energy blade that flies out, cuts through units and terrain, and comes back for a second pass.  
+	**Plasma Cutter** (secondary, digger): a short beam that melts through the ground like a digger and burns anyone in its path.  
+	**Sentry Deployer**: unfolds into a friendly turret for 30 seconds once thrown.  
+	**Tesla Trap**: anchors itself and zaps up to two nearby enemies at a time until its charge runs out.
+
+- Local image overrides. An image placed at the same path under `Userdata/SpriteOverrides/` is used instead of the game's own, e.g. `Userdata/SpriteOverrides/Base.rte/Devices/Arsenal/Sprites/Tunneler.png` for `Data/Base.rte/Devices/Arsenal/Sprites/Tunneler.png`. This allows using art that can't be shared, like art from other people's mods for personal play, without adding it to the game's files.
+
 - New global script "Combat Feedback". Hit markers and floating damage numbers for your team's hits, multi-kill (double kill up to ultra kill) and killing spree announcements for the unit you control, a short hit stop on multi-kills and a slow-motion moment on spree milestones, and bonus gold for every kill that grows while your team keeps up a combo.
 
 - New global script "Loot Drops". Enemies your team kills drop loot colored by rarity, picked up by walking over it: gold (common, white), medkits (uncommon, green), 15-second power-ups (rare, cyan: Overdrive for faster fire and reloads, Adrenaline for rapid healing and steady footing, Rocket Fuel for an endless jetpack, Bottomless Mag for no reloading) and, now and then, a legendary Arsenal weapon (gold) marked with a beam of light.
