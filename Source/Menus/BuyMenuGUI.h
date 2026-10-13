@@ -364,6 +364,7 @@ namespace RTE {
 			GUNS,
 			BOMBS,
 			SHIELDS,
+			ARSENAL,
 			LOADOUTS,
 			CATEGORYCOUNT
 		};

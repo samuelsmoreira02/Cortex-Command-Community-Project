@@ -36,6 +36,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 	New `Material` INI properties `Flammability` (0 to 1, 0 by default, which never burns), `BurnTime` (in milliseconds, 3000 by default) and `BurnsInto` (the material index it turns into, air by default).  
 	New Lua functions `SceneMan:IgniteTerrain(pos, radius)`, `SceneMan:ExtinguishTerrain(pos, radius)` (both return how many pixels were affected) and `SceneMan:GetBurningTerrainPixelCount()`.
 
+- New "Arsenal" buy menu tab, listing the Arsenal and Arsenal II weapons (guns first, then thrown devices) apart from the other tabs. Any item can be put in it with `AddToGroup = Arsenal`.
+
 - Arsenal: seven new weapons in Base, each with its own recolored sprite, buyable by every faction and the legendary drops of the "Loot Drops" global script.  
 	**Arc Caster** (secondary): bolts that arc lightning from what they hit to up to three more enemies nearby.  
 	**Railgun** (heavy, sniper): charges up, then fires a slug that tears straight through terrain and every unit in a line.  

@@ -34,6 +34,11 @@
 
 using namespace RTE;
 
+namespace {
+	/// The group of the items shown in the Arsenal tab, instead of the tabs they'd otherwise be in.
+	const std::string c_ArsenalGroup = "Arsenal";
+} // namespace
+
 BITMAP* BuyMenuGUI::s_pCursor = 0;
 
 const std::string BuyMenuGUI::c_DefaultBannerImagePath = "Base.rte/GUIs/BuyMenu/BuyMenuBanner.png";
@@ -121,7 +126,7 @@ void BuyMenuGUI::Clear() {
 	m_FirstMainTab = CRAFT;
 	m_LastMainTab = LOADOUTS;
 	m_FirstEquipmentTab = TOOLS;
-	m_LastEquipmentTab = SHIELDS;
+	m_LastEquipmentTab = ARSENAL;
 }
 
 int BuyMenuGUI::Create(Controller* pController) {
@@ -184,6 +189,7 @@ int BuyMenuGUI::Create(Controller* pController) {
 	m_pCategoryTabs[GUNS] = dynamic_cast<GUITab*>(m_pGUIController->GetControl("GunsTab"));
 	m_pCategoryTabs[BOMBS] = dynamic_cast<GUITab*>(m_pGUIController->GetControl("BombsTab"));
 	m_pCategoryTabs[SHIELDS] = dynamic_cast<GUITab*>(m_pGUIController->GetControl("ShieldsTab"));
+	m_pCategoryTabs[ARSENAL] = dynamic_cast<GUITab*>(m_pGUIController->GetControl("ArsenalTab"));
 	m_pCategoryTabs[LOADOUTS] = dynamic_cast<GUITab*>(m_pGUIController->GetControl("LoadoutsTab"));
 	RefreshTabDisabledStates();
 
@@ -727,6 +733,7 @@ void BuyMenuGUI::RefreshTabDisabledStates() {
 	m_pCategoryTabs[GUNS]->SetEnabled(smartBuyMenuNavigationDisabled || m_SelectingEquipment);
 	m_pCategoryTabs[BOMBS]->SetEnabled(smartBuyMenuNavigationDisabled || m_SelectingEquipment);
 	m_pCategoryTabs[SHIELDS]->SetEnabled(smartBuyMenuNavigationDisabled || m_SelectingEquipment);
+	m_pCategoryTabs[ARSENAL]->SetEnabled(smartBuyMenuNavigationDisabled || m_SelectingEquipment);
 	m_pCategoryTabs[LOADOUTS]->SetEnabled(smartBuyMenuNavigationDisabled || !m_SelectingEquipment);
 }
 
@@ -2018,6 +2025,16 @@ void BuyMenuGUI::CategoryChange(bool focusOnCategoryTabs) {
 		AddObjectsToItemList(catalogList, "ThrownDevice", {"Bombs"});
 	} else if (m_MenuCategory == SHIELDS) {
 		AddObjectsToItemList(catalogList, "HeldDevice", {"Shields"});
+	} else if (m_MenuCategory == ARSENAL) {
+		// Guns first, then everything that's thrown.
+		AddObjectsToItemList(catalogList, "HDFirearm", {c_ArsenalGroup});
+		AddObjectsToItemList(catalogList, "ThrownDevice", {c_ArsenalGroup});
+	}
+	// Arsenal items have a tab of their own, so they're left out of the others.
+	if (m_MenuCategory != ARSENAL) {
+		for (std::list<Entity*>& moduleItems: catalogList) {
+			moduleItems.remove_if([](const Entity* entity) { return entity->IsInGroup(c_ArsenalGroup); });
+		}
 	}
 
 	SceneObject* pSObject = 0;
