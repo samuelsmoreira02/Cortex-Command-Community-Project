@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Resources">
@@ -507,6 +507,18 @@
     </ClInclude>
     <ClInclude Include="Source\Menus\LoadingScreen.h">
       <Filter>Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Menus\ModBrowserGUI.h">
+      <Filter>Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\HttpClient.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\JsonValue.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\ModIOClient.h">
+      <Filter>System</Filter>
     </ClInclude>
     <ClInclude Include="Source\Menus\ModManagerGUI.h">
       <Filter>Menus</Filter>
@@ -1105,6 +1117,18 @@
     </ClCompile>
     <ClCompile Include="Source\Menus\LoadingScreen.cpp">
       <Filter>Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Menus\ModBrowserGUI.cpp">
+      <Filter>Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\HttpClient.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\JsonValue.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\ModIOClient.cpp">
+      <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="Source\Menus\ModManagerGUI.cpp">
       <Filter>Menus</Filter>

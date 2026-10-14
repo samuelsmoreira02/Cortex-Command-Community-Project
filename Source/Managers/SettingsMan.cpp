@@ -12,6 +12,38 @@
 
 using namespace RTE;
 
+namespace {
+	const std::string c_DefaultModIOApiURL = "https://api.mod.io/v1"; //!< The mod.io API's usual address.
+
+	/// Makes a full mod.io API URL from the address written in the settings file. The address is written without its scheme, because the INI reader treats "//" as the start of a comment.
+	/// Local test servers are reached over plain HTTP, and everything else over HTTPS.
+	/// @param address The address as written in the settings file, such as "api.mod.io/v1".
+	/// @return The full URL without a trailing slash, or the usual mod.io address if the given one is unusable.
+	std::string ModIOApiURLFromAddress(std::string address) {
+		const size_t schemeEnd = address.find(':');
+		if (schemeEnd != std::string::npos && (address.compare(0, schemeEnd, "http") == 0 || address.compare(0, schemeEnd, "https") == 0)) {
+			const size_t hostStart = address.find_first_not_of(":/", schemeEnd);
+			address.erase(0, hostStart == std::string::npos ? address.size() : hostStart);
+		}
+		while (!address.empty() && (address.back() == '/' || address.back() == ' ')) {
+			address.pop_back();
+		}
+		if (address.empty() || address.find_first_of(":/") == 0) {
+			return c_DefaultModIOApiURL;
+		}
+		const bool isLocal = address.starts_with("localhost") || address.starts_with("127.0.0.1");
+		return (isLocal ? "http://" : "https://") + address;
+	}
+
+	/// Gets the address to write in the settings file for a full mod.io API URL, which is the URL without its scheme.
+	/// @param url The full URL.
+	/// @return The address to write.
+	std::string ModIOAddressFromApiURL(const std::string& url) {
+		const size_t schemeEnd = url.find("://");
+		return schemeEnd == std::string::npos ? url : url.substr(schemeEnd + 3);
+	}
+} // namespace
+
 const std::string SettingsMan::c_ClassName = "SettingsMan";
 
 void SettingsMan::Clear() {
@@ -53,6 +85,8 @@ void SettingsMan::Clear() {
 	m_ForceImmediatePathingRequestCompletion = false;
 
 	m_SkipIntro = false;
+	m_ModIOApiKey.clear();
+	m_ModIOApiURL = c_DefaultModIOApiURL;
 	m_ShowToolTips = true;
 	m_DisableLoadingScreenProgressReport = true;
 	m_LoadingScreenProgressReportPrecision = 100;
@@ -102,6 +136,13 @@ int SettingsMan::Initialize() {
 void SettingsMan::UpdateSettingsFile() const {
 	Writer settingsWriter(m_SettingsPath);
 	g_SettingsMan.Save(settingsWriter);
+}
+
+void SettingsMan::SetModIOApiKey(const std::string& apiKey) {
+	const size_t start = apiKey.find_first_not_of(" \t\r\n");
+	const size_t end = apiKey.find_last_not_of(" \t\r\n");
+	m_ModIOApiKey = start == std::string::npos ? "" : apiKey.substr(start, end - start + 1);
+	UpdateSettingsFile();
 }
 
 int SettingsMan::ReadProperty(const std::string_view& propName, Reader& reader) {
@@ -174,6 +215,15 @@ int SettingsMan::ReadProperty(const std::string_view& propName, Reader& reader) 
 	MatchProperty("AllowSavingToBase", { reader >> m_AllowSavingToBase; });
 	MatchProperty("ShowMetaScenes", { reader >> m_ShowMetaScenes; });
 	MatchProperty("SkipIntro", { reader >> m_SkipIntro; });
+	MatchProperty("ModIOApiKey", {
+		m_ModIOApiKey = reader.ReadPropValue();
+		if (m_ModIOApiKey == "None") {
+			m_ModIOApiKey.clear();
+		}
+	});
+	MatchProperty("ModIOApiURL", {
+		m_ModIOApiURL = ModIOApiURLFromAddress(reader.ReadPropValue());
+	});
 	MatchProperty("ShowToolTips", { reader >> m_ShowToolTips; });
 	MatchProperty("CaseSensitiveFilePaths", { System::EnableFilePathCaseSensitivity(std::stoi(reader.ReadPropValue())); });
 	MatchProperty("DisableLoadingScreenProgressReport", { reader >> m_DisableLoadingScreenProgressReport; });
@@ -360,6 +410,15 @@ int SettingsMan::Save(Writer& writer) const {
 				writer.NewPropertyWithValue("DisableMod", modPath);
 			}
 		}
+	}
+
+	writer.NewLine(false, 2);
+	writer.NewDivider(false);
+	writer.NewLineString("// mod.io: get a free API key at https://mod.io/me/access to browse and install mods from the Mod Manager", false);
+	writer.NewLine(false);
+	writer.NewPropertyWithValue("ModIOApiKey", m_ModIOApiKey.empty() ? "None" : m_ModIOApiKey);
+	if (m_ModIOApiURL != c_DefaultModIOApiURL) {
+		writer.NewPropertyWithValue("ModIOApiURL", ModIOAddressFromApiURL(m_ModIOApiURL));
 	}
 
 	if (!m_EnabledGlobalScripts.empty()) {

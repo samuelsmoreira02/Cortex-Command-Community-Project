@@ -127,7 +127,9 @@ Legenda de esforço: 🟢 semanas · 🟡 1 a 3 meses · 🔴 vários meses
 
 **Situação:** a campanha de conquista (`MetaMan`/`MetagameGUI`, 302 KB num arquivo só) é a parte mais antiga do jogo, e o PR #269 já está refazendo a tela de cenários. Com a progressão, cada clone perdido passa a doer, o que hoje não acontece.
 
-### 1.9 Navegador de mods dentro do jogo · 🟢/🟡 · referência: **RimWorld**, **Noita**, **Baldur's Gate 3** (mod.io)
+### 1.9 Navegador de mods dentro do jogo · ✅ **implementado** (branch `feature/navegador-mods`) · referência: **RimWorld**, **Noita**, **Baldur's Gate 3** (mod.io)
+
+> **Feito:** botão "Browse mod.io" no Mod Manager. Busca por texto, três ordenações (populares, mais baixados, atualizados), páginas de 20, detalhes (autor, resumo, downloads, avaliação, tamanho, versão, tags) e instalação/atualização com um clique, com as dependências diretas instaladas junto. Mostra "installed" e "update available". Proteções: recusa zips com caminhos perigosos (`..`, absolutos), mods que tentam substituir módulos oficiais, zips enormes, e mods feitos para outra versão do jogo (que fariam o jogo recusar abrir); a chave da API só vai para servidores do mod.io. Precisa de uma chave grátis da API do mod.io (mod.io/me/access), colada no próprio navegador. Só funciona no Windows por enquanto (WinHTTP). Testado de ponta a ponta contra um servidor falso do mod.io. **Não feito:** coleções, avaliar mods de dentro do jogo, desinstalar pelo navegador.
 
 **O que é:** buscar, avaliar, baixar e atualizar mods do **mod.io** sem sair do jogo, com resolução automática de dependências e "coleções".
 

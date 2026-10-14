@@ -8,6 +8,7 @@ sources += files(
 'LoadingScreen.cpp',
 'MainMenuGUI.cpp',
 'MetagameGUI.cpp',
+'ModBrowserGUI.cpp',
 'ModManagerGUI.cpp',
 'ObjectPickerGUI.cpp',
 'PauseMenuGUI.cpp',

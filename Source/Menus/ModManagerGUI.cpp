@@ -1,4 +1,5 @@
 #include "ModManagerGUI.h"
+#include "ModBrowserGUI.h"
 
 #include "SettingsMan.h"
 #include "PresetMan.h"
@@ -54,7 +55,13 @@ ModManagerGUI::ModManagerGUI(AllegroScreen* guiScreen, GUIInputWrapper* guiInput
 
 	m_ModsListFetched = false;
 	m_ScriptsListFetched = false;
+
+	m_BrowseModIOButton = dynamic_cast<GUIButton*>(m_GUIControlManager->GetControl("ButtonBrowseModIO"));
+	m_ModBrowser = std::make_unique<ModBrowserGUI>(guiScreen, guiInput);
+	m_ModBrowserOpen = false;
 }
+
+ModManagerGUI::~ModManagerGUI() = default;
 
 void ModManagerGUI::PopulateKnownModsList() {
 	for (int i = 0; i < g_PresetMan.GetTotalModuleCount(); ++i) {
@@ -247,6 +254,12 @@ void ModManagerGUI::ResetSelectionsAndGoToTop() {
 }
 
 bool ModManagerGUI::HandleInputEvents() {
+	if (m_ModBrowserOpen) {
+		if (m_ModBrowser->HandleInputEvents()) {
+			m_ModBrowserOpen = false;
+		}
+		return false;
+	}
 	if (!ListsFetched()) {
 		m_DisclaimerText = m_ModOrScriptDescriptionLabel->GetText();
 		PopulateKnownModsList();
@@ -263,6 +276,9 @@ bool ModManagerGUI::HandleInputEvents() {
 			if (guiEvent.GetControl() == m_BackToMainButton) {
 				ResetSelectionsAndGoToTop();
 				return true;
+			} else if (guiEvent.GetControl() == m_BrowseModIOButton) {
+				g_GUISound.ButtonPressSound()->Play();
+				m_ModBrowserOpen = true;
 			} else if (guiEvent.GetControl() == m_ToggleModButton) {
 				ToggleMod();
 			} else if (guiEvent.GetControl() == m_ToggleScriptButton) {
@@ -332,5 +348,9 @@ bool ModManagerGUI::HandleInputEvents() {
 }
 
 void ModManagerGUI::Draw() const {
+	if (m_ModBrowserOpen) {
+		m_ModBrowser->Draw();
+		return;
+	}
 	m_GUIControlManager->Draw();
 }

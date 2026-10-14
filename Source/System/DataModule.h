@@ -62,6 +62,12 @@ namespace RTE {
 		/// @param ignoreMissingItems Whether module loader should ignore missing items in this module.
 		/// @return Whether the DataModule was successfully created on disk.
 		static bool CreateOnDiskAsUserdata(const std::string& moduleName, const std::string_view& friendlyName, bool scanFolderContents = false, bool ignoreMissingItems = false);
+
+		/// Gets why a mod made for a given version of Cortex Command can't be loaded by this version of the game, if it can't.
+		/// @param moduleName File/folder name of the data module, e.g. "MyMod.rte".
+		/// @param supportedGameVersion The SupportedGameVersion from the mod's Index.ini, or nullptr if it doesn't specify one.
+		/// @return Why the mod can't be loaded, or an empty string if it can.
+		static std::string GetGameVersionIncompatibility(const std::string& moduleName, const version::Semver200_version* supportedGameVersion);
 #pragma endregion
 
 #pragma region Destruction

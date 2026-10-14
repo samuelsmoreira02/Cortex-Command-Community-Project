@@ -12,6 +12,7 @@ namespace RTE {
 	class GUILabel;
 	class GUIButton;
 	class GUIListBox;
+	class ModBrowserGUI;
 
 	/// Integrated mod and script manager user interface composition and handling.
 	class ModManagerGUI {
@@ -23,6 +24,9 @@ namespace RTE {
 		/// @param guiInput Pointer to a GUIInput interface that will be used by this ModManagerGUI's GUIControlManager. Ownership is NOT transferred!
 		/// @param createForPauseMenu Whether this SettingsGUI is part of ModManagerGUI and should have a slightly different layout.
 		ModManagerGUI(AllegroScreen* guiScreen, GUIInputWrapper* guiInput, bool createForPauseMenu = false);
+
+		/// Destructor method used to clean up a ModManagerGUI object before deletion from system memory.
+		~ModManagerGUI();
 #pragma endregion
 
 #pragma region Concrete Methods
@@ -100,8 +104,12 @@ namespace RTE {
 		bool m_ModsListFetched; //!< Whether the known mods list was fetched, even if no valid mod DataModules were added to it.
 		bool m_ScriptsListFetched; //!< Whether the known scripts list was fetched, even if no valid GlobalScripts were added to it.
 
+		std::unique_ptr<ModBrowserGUI> m_ModBrowser; //!< The mod.io browser, opened from this menu.
+		bool m_ModBrowserOpen; //!< Whether the mod.io browser is showing instead of this menu.
+
 		/// GUI elements that compose the Mod Manager menu screen.
 		GUIButton* m_BackToMainButton;
+		GUIButton* m_BrowseModIOButton;
 		GUIButton* m_ToggleModButton;
 		GUIButton* m_ToggleScriptButton;
 		GUIListBox* m_ModsListBox;

@@ -289,6 +289,18 @@ namespace RTE {
 		/// @return Whether intro is set to be skipped or not.
 		bool SkipIntro() const { return m_SkipIntro; }
 
+		/// Gets the mod.io API key used to browse and install mods from within the game.
+		/// @return The API key, or an empty string if none is set.
+		const std::string& GetModIOApiKey() const { return m_ModIOApiKey; }
+
+		/// Sets the mod.io API key used to browse and install mods from within the game, and saves it to the settings file.
+		/// @param apiKey The API key. Surrounding whitespace is dropped.
+		void SetModIOApiKey(const std::string& apiKey);
+
+		/// Gets the base URL of the mod.io API, without a trailing slash.
+		/// @return The base URL of the mod.io API.
+		const std::string& GetModIOApiURL() const { return m_ModIOApiURL; }
+
 		/// Sets whether the game intro should be skipped on game startup or not.
 		/// @param play Whether to skip game intro or not.
 		void SetSkipIntro(bool play) { m_SkipIntro = play; }
@@ -400,6 +412,8 @@ namespace RTE {
 		bool m_ForceImmediatePathingRequestCompletion; //!< Whether pathing requests will be forced to immediately complete for the next frame, or if they can take multiple frames to calculate.
 
 		bool m_SkipIntro; //!< Whether to play the intro of the game or skip directly to the main menu.
+		std::string m_ModIOApiKey; //!< The mod.io API key used to browse and install mods from within the game. Empty if none is set.
+		std::string m_ModIOApiURL; //!< The base URL of the mod.io API, without a trailing slash. Can be pointed elsewhere, like at a local server for testing.
 		bool m_ShowToolTips; //!< Whether ToolTips are enabled or not.
 		bool m_DisableLoadingScreenProgressReport; //!< Whether to display the reader progress report during module loading or not. Greatly increases loading speeds when disabled.
 		int m_LoadingScreenProgressReportPrecision; //!< How accurately the reader progress report tells what line it's reading during module loading. Lower values equal more precision at the cost of loading speed.

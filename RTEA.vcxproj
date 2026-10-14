@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug Full|Win32">
@@ -778,7 +778,11 @@
     <ClInclude Include="Source\Managers\ThreadMan.h" />
     <ClInclude Include="Source\Managers\WindowMan.h" />
     <ClInclude Include="Source\Menus\LoadingScreen.h" />
+    <ClInclude Include="Source\Menus\ModBrowserGUI.h" />
     <ClInclude Include="Source\Menus\ModManagerGUI.h" />
+    <ClInclude Include="Source\System\HttpClient.h" />
+    <ClInclude Include="Source\System\JsonValue.h" />
+    <ClInclude Include="Source\System\ModIOClient.h" />
     <ClInclude Include="Source\Menus\PauseMenuGUI.h" />
     <ClInclude Include="Source\Menus\SaveLoadMenuGUI.h" />
     <ClInclude Include="Source\Menus\ScenarioActivityConfigGUI.h" />
@@ -1039,7 +1043,11 @@
     <ClCompile Include="Source\Managers\ThreadMan.cpp" />
     <ClCompile Include="Source\Managers\WindowMan.cpp" />
     <ClCompile Include="Source\Menus\LoadingScreen.cpp" />
+    <ClCompile Include="Source\Menus\ModBrowserGUI.cpp" />
     <ClCompile Include="Source\Menus\ModManagerGUI.cpp" />
+    <ClCompile Include="Source\System\HttpClient.cpp" />
+    <ClCompile Include="Source\System\JsonValue.cpp" />
+    <ClCompile Include="Source\System\ModIOClient.cpp" />
     <ClCompile Include="Source\Menus\PauseMenuGUI.cpp" />
     <ClCompile Include="Source\Menus\SaveLoadMenuGUI.cpp" />
     <ClCompile Include="Source\Menus\ScenarioActivityConfigGUI.cpp" />
