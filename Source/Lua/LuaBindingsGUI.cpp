@@ -33,6 +33,7 @@ LuaBindingRegisterFunctionDefinitionForType(GUILuaBindings, GUIBanner) {
 LuaBindingRegisterFunctionDefinitionForType(GUILuaBindings, BuyMenuGUI) {
 	return luabind::class_<BuyMenuGUI>("BuyMenuGUI")
 
+	    .property("Enabled", &BuyMenuGUI::IsEnabled, &BuyMenuGUI::SetEnabled)
 	    .property("ShowOnlyOwnedItems", &BuyMenuGUI::GetOnlyShowOwnedItems, &BuyMenuGUI::SetOnlyShowOwnedItems)
 	    .property("EnforceMaxPassengersConstraint", &BuyMenuGUI::EnforceMaxPassengersConstraint, &BuyMenuGUI::SetEnforceMaxPassengersConstraint)
 	    .property("EnforceMaxMassConstraint", &BuyMenuGUI::EnforceMaxMassConstraint, &BuyMenuGUI::SetEnforceMaxMassConstraint)

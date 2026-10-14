@@ -37,6 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 	New Lua functions `SceneMan:IgniteTerrain(pos, radius)`, `SceneMan:ExtinguishTerrain(pos, radius)` (both return how many pixels were affected) and `SceneMan:GetBurningTerrainPixelCount()`.
 
 - New "Arsenal" buy menu tab, listing the Arsenal and Arsenal II weapons (guns first, then thrown devices) apart from the other tabs. Any item can be put in it with `AddToGroup = Arsenal`.
+n- New `BuyMenuGUI` Lua property `Enabled` (R/W), to open or close a player's buy menu from scripts, e.g. `ToGameActivity(ActivityMan:GetActivity()):GetBuyGUI(player).Enabled = true`.
 
 - Arsenal: seven new weapons in Base, each with its own recolored sprite, buyable by every faction and the legendary drops of the "Loot Drops" global script.  
 	**Arc Caster** (secondary): bolts that arc lightning from what they hit to up to three more enemies nearby.  
