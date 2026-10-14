@@ -85,6 +85,8 @@ function PhotoModeScript:Update(activity)
 	for player = Activity.PLAYER_1, Activity.MAXPLAYERCOUNT - 1 do
 		if activity:PlayerActive(player) and activity:PlayerHuman(player) then
 			local screen = activity:ScreenOfPlayer(player);
+			-- Activities set their objective text every update, before global scripts run, so clearing it here keeps it off the picture.
+			FrameMan:ClearScreenText(screen);
 			-- Keep the soldier from walking away, or shooting, while the keys are used for the camera.
 			local actor = activity:GetControlledActor(player);
 			if actor and MovableMan:IsActor(actor) then

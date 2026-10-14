@@ -4,7 +4,8 @@
 function ColorblindTeamMarkersScript:StartScript()
 	self.markerColors = {[Activity.TEAM_1] = 216, [Activity.TEAM_2] = 86, [Activity.TEAM_3] = 117, [Activity.TEAM_4] = 194};
 	self.outlineColor = 245;
-	self.markerOffset = Vector(0, -34);
+	-- Left of the health readout, so it stays clear of names and other labels drawn above units.
+	self.markerOffset = Vector(-24, 6);
 	self.markerSize = 4;
 end
 
@@ -39,7 +40,8 @@ function ColorblindTeamMarkersScript:UpdateScript()
 	end
 
 	for player = Activity.PLAYER_1, Activity.MAXPLAYERCOUNT - 1 do
-		if activity:PlayerActive(player) and activity:PlayerHuman(player) and activity:GetViewState(player) == Activity.NORMAL then
+		-- Nothing is drawn while the HUD is hidden, like in photo mode.
+		if activity:PlayerActive(player) and activity:PlayerHuman(player) and activity:GetViewState(player) == Activity.NORMAL and not FrameMan:IsHudDisabled(activity:ScreenOfPlayer(player)) then
 			local screen = activity:ScreenOfPlayer(player);
 			local screenCenter = CameraMan:GetOffset(screen) + Vector(FrameMan.PlayerScreenWidth * 0.5, FrameMan.PlayerScreenHeight * 0.5);
 			-- Only the units that can be on this player's screen get a marker, with some slack so they don't pop in at the edges.

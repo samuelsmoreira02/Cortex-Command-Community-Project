@@ -225,7 +225,8 @@ function CombatFeedbackScript:Draw(activity)
 	end
 
 	for player = Activity.PLAYER_1, Activity.MAXPLAYERCOUNT - 1 do
-		if activity:PlayerActive(player) and activity:PlayerHuman(player) and activity:GetViewState(player) == Activity.NORMAL then
+		-- Nothing is drawn while the HUD is hidden, like in photo mode.
+		if activity:PlayerActive(player) and activity:PlayerHuman(player) and activity:GetViewState(player) == Activity.NORMAL and not FrameMan:IsHudDisabled(activity:ScreenOfPlayer(player)) then
 			local screen = activity:ScreenOfPlayer(player);
 			local team = activity:GetTeamOfPlayer(player);
 			for _, floatingText in ipairs(self.floatingTexts) do

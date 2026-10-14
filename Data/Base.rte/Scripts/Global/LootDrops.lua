@@ -304,7 +304,8 @@ function LootDropsScript:Draw(activity)
 
 	-- Orbs bob and pulse, so they catch the eye.
 	for player = Activity.PLAYER_1, Activity.MAXPLAYERCOUNT - 1 do
-		if activity:PlayerActive(player) and activity:PlayerHuman(player) and activity:GetViewState(player) == Activity.NORMAL then
+		-- Nothing is drawn while the HUD is hidden, like in photo mode.
+		if activity:PlayerActive(player) and activity:PlayerHuman(player) and activity:GetViewState(player) == Activity.NORMAL and not FrameMan:IsHudDisabled(activity:ScreenOfPlayer(player)) then
 			local screen = activity:ScreenOfPlayer(player);
 			local team = activity:GetTeamOfPlayer(player);
 			for _, orb in ipairs(self.orbs) do

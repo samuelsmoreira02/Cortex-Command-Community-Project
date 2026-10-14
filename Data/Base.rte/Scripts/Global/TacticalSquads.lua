@@ -29,7 +29,7 @@ function TacticalSquadsScript:UpdateScript()
 			local leader = activity:GetControlledActor(player);
 			if leader and MovableMan:IsActor(leader) then
 				self:UpdateOrdersPieSlice(leader);
-				if self.squads[leader.UniqueID] and activity:GetViewState(player) == Activity.NORMAL then
+				if self.squads[leader.UniqueID] and activity:GetViewState(player) == Activity.NORMAL and not FrameMan:IsHudDisabled(activity:ScreenOfPlayer(player)) then
 					self:DrawSquadHUD(activity:ScreenOfPlayer(player), leader);
 				end
 			end

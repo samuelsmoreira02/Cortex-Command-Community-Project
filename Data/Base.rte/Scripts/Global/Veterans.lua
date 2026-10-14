@@ -258,7 +258,9 @@ function VeteransScript:DrawHUD(activity)
 			if controlledActor and MovableMan:IsActor(controlledActor) then
 				self:UpdateRosterPieSlice(controlledActor);
 			end
-			if activity:GetViewState(player) == Activity.NORMAL then
+			-- Nothing is drawn while the HUD is hidden, like in photo mode.
+			local hudHidden = FrameMan:IsHudDisabled(screen);
+			if activity:GetViewState(player) == Activity.NORMAL and not hudHidden then
 				for _, entry in pairs(self.deployed) do
 					local mo = MovableMan:FindObjectByUniqueID(entry.UniqueID);
 					if mo and IsActor(mo) and mo.Team == team then
@@ -274,11 +276,13 @@ function VeteransScript:DrawHUD(activity)
 					end
 				end
 			end
-			self:DrawNotifications(screen);
+			if not hudHidden then
+				self:DrawNotifications(screen);
+			end
 			if self.rosterViewers[player] then
 				if self.rosterViewers[player]:IsPastRealMS(self.rosterDisplayDurationMS) then
 					self.rosterViewers[player] = nil;
-				else
+				elseif not hudHidden then
 					self:DrawRoster(screen);
 				end
 			end
