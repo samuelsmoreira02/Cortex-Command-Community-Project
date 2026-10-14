@@ -1,4 +1,5 @@
 #include "TerrainFire.h"
+#include "TerrainFluids.h"
 #include "SLTerrain.h"
 #include "Material.h"
 #include "MovableObject.h"
@@ -87,6 +88,12 @@ int TerrainFire::Extinguish(const Vector& pos, float radius) {
 			return false;
 		}
 		m_BurningPositions.erase(pixel.Y * g_SceneMan.GetSceneWidth() + pixel.X);
+		// Burning pixels flicker in fire colors, so give the pixel its material's color back.
+		if (SLTerrain* terrain = g_SceneMan.GetTerrain()) {
+			if (const Material* material = g_SceneMan.GetMaterialFromID(terrain->GetMaterialPixel(pixel.X, pixel.Y)); material && material->GetIndex() != MaterialColorKeys::g_MaterialAir) {
+				terrain->SetFGColorPixel(pixel.X, pixel.Y, material->GetColorIndex());
+			}
+		}
 		return true;
 	});
 	return static_cast<int>(burningBefore - m_BurningPixels.size());
@@ -101,7 +108,7 @@ void TerrainFire::SpawnFlame(int x, int y) const {
 	}
 }
 
-void TerrainFire::Update(SLTerrain* terrain) {
+void TerrainFire::Update(SLTerrain* terrain, TerrainFluids& fluids) {
 	std::scoped_lock<std::mutex> lock(m_Mutex);
 	if (m_BurningPixels.empty() || !terrain) {
 		return;
@@ -139,6 +146,20 @@ void TerrainFire::Update(SLTerrain* terrain) {
 			continue;
 		}
 		m_BurningPixels[i].TimeLeftMS -= elapsedMS;
+
+		// Water next to the fire puts it out, boiling into steam, and oil next to it catches fire.
+		if (fluids.GetFluidPixelCount() > 0) {
+			bool putOut = false;
+			for (const auto& [offsetX, offsetY]: {std::pair{0, -1}, std::pair{-1, 0}, std::pair{1, 0}, std::pair{0, 1}}) {
+				putOut = fluids.TouchedByFire(pixelX + offsetX, pixelY + offsetY) || putOut;
+			}
+			if (putOut) {
+				m_BurningPixels[i].TimeLeftMS = 0;
+				m_BurningPositions.erase(pixelY * width + pixelX);
+				terrain->SetFGColorPixel(pixelX, pixelY, burningMaterial->GetColorIndex());
+				continue;
+			}
+		}
 
 		for (const SpreadDirection& direction: c_SpreadDirections) {
 			int neighbourX = pixelX + direction.X;

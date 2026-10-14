@@ -122,11 +122,33 @@ namespace RTE {
 		/// @return The seed of the last generated terrain.
 		unsigned int GetLastProceduralTerrainSeed() const;
 
-		/// Sets the flammable terrain within a radius on fire. Only pixels of materials with a Flammability above 0 catch fire.
+		/// Sets the flammable terrain and any oil within a radius on fire. Only pixels of materials with a Flammability above 0 catch fire.
 		/// @param pos The center of the area, in scene coordinates.
 		/// @param radius The radius of the area, in pixels.
 		/// @return How many pixels caught fire.
 		int IgniteTerrain(const Vector& pos, float radius);
+
+		/// Fills the open space within a radius with a fluid, which then flows on its own.
+		/// @param fluidName The fluid: "Water", "Oil", "Acid", "Toxic Gas" or "Steam".
+		/// @param pos The center of the area, in scene coordinates.
+		/// @param radius The radius of the area, in pixels.
+		/// @return How many pixels were filled.
+		int AddFluid(const std::string& fluidName, const Vector& pos, float radius);
+
+		/// Removes all liquids and gases within a radius.
+		/// @param pos The center of the area, in scene coordinates.
+		/// @param radius The radius of the area, in pixels.
+		/// @return How many pixels of fluid were removed.
+		int RemoveFluids(const Vector& pos, float radius);
+
+		/// Gets the fluid at a position.
+		/// @param pos The position, in scene coordinates.
+		/// @return The name of the fluid there, or an empty string if there's none.
+		std::string GetFluidAt(const Vector& pos);
+
+		/// Gets how many pixels of the scene hold a liquid or gas.
+		/// @return The number of fluid pixels.
+		int GetFluidPixelCount() const;
 
 		/// Puts out burning terrain within a radius.
 		/// @param pos The center of the area, in scene coordinates.

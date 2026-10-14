@@ -41,6 +41,7 @@ void SceneLayerImpl<TRACK_DRAWINGS, STATIC_TEXTURE>::Clear() {
 	m_Drawings.clear();
 	m_MainBitmapOwned = false;
 	m_DrawMasked = true;
+	m_DrawAlpha = 255;
 	m_WrapX = true;
 	m_WrapY = true;
 	m_OriginOffset.Reset();
@@ -93,6 +94,7 @@ int SceneLayerImpl<TRACK_DRAWINGS, STATIC_TEXTURE>::Create(const SceneLayerImpl&
 
 	m_BitmapFile = reference.m_BitmapFile;
 	m_DrawMasked = reference.m_DrawMasked;
+	m_DrawAlpha = reference.m_DrawAlpha;
 	m_WrapX = reference.m_WrapX;
 	m_WrapY = reference.m_WrapY;
 	m_OriginOffset = reference.m_OriginOffset;
@@ -531,11 +533,11 @@ void SceneLayerImpl<TRACK_DRAWINGS, STATIC_TEXTURE>::DrawTiled(const Box& target
 				    g_GLResourceMan.GetStaticTextureFromBitmap(m_MainBitmap),
 				    {0.0f, 0.0f, static_cast<float>(m_MainBitmap->w), static_cast<float>(m_MainBitmap->h)},
 				    {destX, destY, bitmapWidth, bitmapHeight},
-				    {0.0f, 0.0f}, 0.0f, {255, 255, 255, 255});
+				    {0.0f, 0.0f}, 0.0f, {255, 255, 255, m_DrawAlpha});
 			} else {
 				m_MainTexture->Draw(
 				    {0.0f, 0.0f, static_cast<float>(m_MainBitmap->w), static_cast<float>(m_MainBitmap->h)},
-				    {destX, destY, bitmapWidth, bitmapHeight});
+				    {destX, destY, bitmapWidth, bitmapHeight}, m_DrawAlpha);
 			}
 			if (!m_WrapY) {
 				break;

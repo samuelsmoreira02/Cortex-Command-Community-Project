@@ -757,6 +757,7 @@
     <ClInclude Include="Source\Entities\TerrainGenerator.h" />
     <ClInclude Include="Source\Entities\TerrainCollapse.h" />
     <ClInclude Include="Source\Entities\TerrainFire.h" />
+    <ClInclude Include="Source\Entities\TerrainFluids.h" />
     <ClInclude Include="Source\GUI\GUIInterface.h" />
     <ClInclude Include="Source\GUI\GUIReader.h" />
     <ClInclude Include="Source\GUI\GUISound.h" />
@@ -1032,6 +1033,7 @@
     <ClCompile Include="Source\Entities\TerrainGenerator.cpp" />
     <ClCompile Include="Source\Entities\TerrainCollapse.cpp" />
     <ClCompile Include="Source\Entities\TerrainFire.cpp" />
+    <ClCompile Include="Source\Entities\TerrainFluids.cpp" />
     <ClCompile Include="Source\GUI\GUIReader.cpp" />
     <ClCompile Include="Source\GUI\GUISound.cpp" />
     <ClCompile Include="Source\GUI\GUIWriter.cpp" />

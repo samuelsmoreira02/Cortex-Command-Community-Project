@@ -58,7 +58,7 @@ BigTexture::~BigTexture() {
 	}
 }
 
-void BigTexture::Draw(Rectangle source, Rectangle dest) {
+void BigTexture::Draw(Rectangle source, Rectangle dest, unsigned char alpha) {
 	ZoneScoped;
 	TracyGpuZone("BigTexture::Draw");
 	float scaleX = dest.width / source.width;
@@ -91,7 +91,7 @@ void BigTexture::Draw(Rectangle source, Rectangle dest) {
 			     sourceIntersect.m_Height * scaleY},
 			    {0.0f, 0.0f},
 			    0.0f,
-			    {255, 255, 255, 255}
+			    {255, 255, 255, alpha}
 			);
 		}
 	}

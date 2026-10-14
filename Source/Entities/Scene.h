@@ -12,6 +12,7 @@
 #include "SceneLayer.h"
 #include "TerrainFire.h"
 #include "TerrainCollapse.h"
+#include "TerrainFluids.h"
 
 #include <array>
 #include <map>
@@ -693,6 +694,10 @@ namespace RTE {
 		/// @return The terrain collapse.
 		TerrainCollapse& GetTerrainCollapse() { return m_TerrainCollapse; }
 
+		/// Gets the liquids and gases flowing through this Scene's terrain.
+		/// @return The terrain fluids.
+		TerrainFluids& GetTerrainFluids() { return m_TerrainFluids; }
+
 		/// Whether this scene is a temprorary metagame scene and should
 		/// not be used anywhere except in metagame.
 		/// @return Whether scene belongs to metagame or not.
@@ -760,6 +765,8 @@ namespace RTE {
 		TerrainFire m_TerrainFire;
 		// Makes terrain that lost its support fall.
 		TerrainCollapse m_TerrainCollapse;
+		// The liquids and gases flowing through the terrain.
+		TerrainFluids m_TerrainFluids;
 		// Timer for when to do an update of the pathfinding data
 		Timer m_PartialPathUpdateTimer;
 

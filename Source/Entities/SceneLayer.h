@@ -116,6 +116,10 @@ namespace RTE {
 		/// @param z The depth to draw at, negative values are further to the front in the range c_NearDepth to c_FarDepth.
 		void SetZOrder(float z) { m_ZOrder = z; }
 
+		/// Sets how opaque this SceneLayer is drawn.
+		/// @param alpha The opacity, from 0 (invisible) to 255 (fully opaque).
+		void SetDrawAlpha(unsigned char alpha) { m_DrawAlpha = alpha; }
+
 		/// Gets the scroll ratio that modifies the offset.
 		/// @return A copy of the ratio.
 		Vector GetScrollRatio() const { return m_ScrollRatio; }
@@ -232,6 +236,7 @@ namespace RTE {
 		bool m_MainBitmapOwned; //!< Whether the main bitmap is owned by this.
 		bool m_MainBitmapUpdated; //!< Whether the main bitmap was updated since the last draw.
 		bool m_DrawMasked; //!< Whether pixels marked as transparent (index 0, magenta) are skipped when drawing or not (masked drawing).
+		unsigned char m_DrawAlpha; //!< How opaque this SceneLayer is drawn, from 0 (invisible) to 255 (fully opaque).
 
 		bool m_WrapX; //!< Whether wrapping is enabled on the X axis.
 		bool m_WrapY; //!< Whether wrapping is enable on the Y axis.

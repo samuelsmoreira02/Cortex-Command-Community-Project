@@ -182,7 +182,27 @@ unsigned int SceneMan::GetLastProceduralTerrainSeed() const {
 }
 
 int SceneMan::IgniteTerrain(const Vector& pos, float radius) {
-	return m_pCurrentScene ? m_pCurrentScene->GetTerrainFire().Ignite(m_pCurrentScene->GetTerrain(), pos, radius) : 0;
+	if (!m_pCurrentScene) {
+		return 0;
+	}
+	const int ignitedTerrain = m_pCurrentScene->GetTerrainFire().Ignite(m_pCurrentScene->GetTerrain(), pos, radius);
+	return ignitedTerrain + m_pCurrentScene->GetTerrainFluids().IgniteOil(pos, radius);
+}
+
+int SceneMan::AddFluid(const std::string& fluidName, const Vector& pos, float radius) {
+	return m_pCurrentScene ? m_pCurrentScene->GetTerrainFluids().AddFluid(m_pCurrentScene->GetTerrain(), TerrainFluids::GetFluidTypeFromName(fluidName), pos, radius) : 0;
+}
+
+int SceneMan::RemoveFluids(const Vector& pos, float radius) {
+	return m_pCurrentScene ? m_pCurrentScene->GetTerrainFluids().RemoveFluids(pos, radius) : 0;
+}
+
+std::string SceneMan::GetFluidAt(const Vector& pos) {
+	return m_pCurrentScene ? TerrainFluids::GetFluidTypeName(m_pCurrentScene->GetTerrainFluids().GetFluidAt(pos)) : "";
+}
+
+int SceneMan::GetFluidPixelCount() const {
+	return m_pCurrentScene ? m_pCurrentScene->GetTerrainFluids().GetFluidPixelCount() : 0;
 }
 
 int SceneMan::ExtinguishTerrain(const Vector& pos, float radius) {
@@ -2588,6 +2608,7 @@ void SceneMan::Update(int screenId) {
 	SLTerrain* terrain = m_pCurrentScene->GetTerrain();
 	terrain->SetOffset(offset);
 	terrain->Update();
+	m_pCurrentScene->GetTerrainFluids().SetOffset(offset);
 
 	// Background layers may scroll in fractions of the real offset and need special care to avoid jumping after having traversed wrapped edges, so they need the total offset without taking wrapping into account.
 	const Vector& unwrappedOffset = g_CameraMan.GetUnwrappedOffset(screenId);
@@ -2646,6 +2667,8 @@ void SceneMan::Draw(BITMAP* targetBitmap, BITMAP* targetGUIBitmap, const Vector&
 				terrain->Draw(targetDimensions, targetBox);
 			}
 			m_pMOColorLayer->Draw(targetDimensions, targetBox);
+			// Fluids are see-through, so they're drawn over whatever's in them.
+			m_pCurrentScene->GetTerrainFluids().Draw(targetDimensions, targetBox);
 
 			if (!skipTerrain) {
 				terrain->SetLayerToDraw(SLTerrain::LayerType::ForegroundLayer);

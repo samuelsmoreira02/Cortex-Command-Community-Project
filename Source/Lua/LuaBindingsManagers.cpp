@@ -324,6 +324,10 @@ LuaBindingRegisterFunctionDefinitionForType(ManagerLuaBindings, SceneMan) {
 	    .def("IgniteTerrain", &SceneMan::IgniteTerrain)
 	    .def("ExtinguishTerrain", &SceneMan::ExtinguishTerrain)
 	    .def("GetBurningTerrainPixelCount", &SceneMan::GetBurningTerrainPixelCount)
+	    .def("AddFluid", &SceneMan::AddFluid)
+	    .def("RemoveFluids", &SceneMan::RemoveFluids)
+	    .def("GetFluidAt", &SceneMan::GetFluidAt)
+	    .def("GetFluidPixelCount", &SceneMan::GetFluidPixelCount)
 	    .def("GetFallingTerrainChunkCount", &SceneMan::GetFallingTerrainChunkCount)
 
 	    .def("GetTerrain", &SceneMan::GetTerrain)

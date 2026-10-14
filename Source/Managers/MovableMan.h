@@ -249,6 +249,14 @@ namespace RTE {
 		/// @return The number of actors.
 		long GetActorCount() const { return m_Actors.size(); }
 
+		/// Gets the actors currently held. Only safe to use outside of MovableMan's own update.
+		/// @return The actors.
+		const std::deque<Actor*>& GetActors() const { return m_Actors; }
+
+		/// Gets the items currently lying around, which doesn't include held or attached ones. Only safe to use outside of MovableMan's own update.
+		/// @return The items.
+		const std::deque<MovableObject*>& GetItems() const { return m_Items; }
+
 		/// Gets the number of particles (MOPixel:s) currently held.
 		/// @return The number of particles.
 		long GetParticleCount() const { return m_Particles.size(); }

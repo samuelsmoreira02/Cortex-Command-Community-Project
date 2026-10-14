@@ -19,7 +19,8 @@ namespace RTE {
 		/// @brief Draw this texture (or part of it) to the screen
 		/// @param source The source rectangle inside this texture.
 		/// @param dest The destination rectangle on the screen.
-		void Draw(Rectangle source, Rectangle dest);
+		/// @param alpha How opaque to draw the texture, from 0 (invisible) to 255 (fully opaque).
+		void Draw(Rectangle source, Rectangle dest, unsigned char alpha = 255);
 		std::vector<Texture2D> m_Textures{}; //!< The tiles of this BigTexture.
 		std::vector<unsigned int> m_UploadBuffers{}; //!< Upload buffers to reduce wait time on big uploads.
 		std::vector<Box> m_Regions{}; //!< The offset regions of each tile.

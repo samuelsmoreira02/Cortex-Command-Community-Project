@@ -36,6 +36,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 	New `Material` INI properties `Flammability` (0 to 1, 0 by default, which never burns), `BurnTime` (in milliseconds, 3000 by default) and `BurnsInto` (the material index it turns into, air by default).  
 	New Lua functions `SceneMan:IgniteTerrain(pos, radius)`, `SceneMan:ExtinguishTerrain(pos, radius)` (both return how many pixels were affected) and `SceneMan:GetBurningTerrainPixelCount()`.
 
+- Liquids and gases.  
+	Water, oil, acid, toxic gas and steam flow through the open spaces of the terrain pixel by pixel. Liquids fall, pour over ledges, spread out and level off into pools, lighter ones floating on heavier ones, and gases drift upwards, billowing, until they thin out. They never block movement: whatever's in a liquid is slowed down and pushed up by it, so units can wade, sink or float.  
+	Water puts out burning terrain and boils into steam. Oil catches fire from burning terrain and `SceneMan:IgniteTerrain`, then burns away while spreading its fire to the oil and flammable terrain around it, until water puts it out. Acid eats through the terrain beneath it, softer materials faster, and burns actors standing in it, fizzling into toxic fumes once spent. Toxic gas hurts actors with their heads in it.  
+	Only pixels holding a fluid are simulated, and settled pools are only checked now and then, so a scene without fluids costs nothing. Fluids aren't kept in saved games.  
+	New Lua functions `SceneMan:AddFluid(fluidName, pos, radius)` (with "Water", "Oil", "Acid", "Toxic Gas" or "Steam", filling the open space in the radius and returning how many pixels were filled), `SceneMan:RemoveFluids(pos, radius)`, `SceneMan:GetFluidAt(pos)` (the fluid's name, or an empty string) and `SceneMan:GetFluidPixelCount()`.
+
+- Fluid grenades, in the "Arsenal" buy menu tab: the Hydro Grenade (water), Acid Flask, Napalm Canister (burning oil) and Toxin Grenade (toxic gas), which burst a couple of seconds after the pin is pulled and spill their contents.
+
+- New global script "Flooded Caves". When a game starts, some of the caves under the surface fill up with water, and now and then with oil, which floods out into any tunnel dug into them.
+
 - New "Arsenal" buy menu tab, listing the Arsenal and Arsenal II weapons (guns first, then thrown devices) apart from the other tabs. Any item can be put in it with `AddToGroup = Arsenal`.
 
 - New `BuyMenuGUI` Lua property `Enabled` (R/W), to open or close a player's buy menu from scripts, e.g. `ToGameActivity(ActivityMan:GetActivity()):GetBuyGUI(player).Enabled = true`.

@@ -351,6 +351,7 @@ void Scene::Clear() {
 	m_PathfindingUpdated = false;
 	m_TerrainFire.Clear();
 	m_TerrainCollapse.Clear();
+	m_TerrainFluids.Clear();
 	m_PartialPathUpdateTimer.Reset();
 
 	for (int set = PLACEONLOAD; set < PLACEDSETSCOUNT; ++set)
@@ -2456,8 +2457,9 @@ void Scene::Update() {
 
 	m_PathfindingUpdated = false;
 
-	m_TerrainFire.Update(m_pTerrain);
+	m_TerrainFire.Update(m_pTerrain, m_TerrainFluids);
 	m_TerrainCollapse.Update(m_pTerrain);
+	m_TerrainFluids.Update(m_pTerrain, m_TerrainFire);
 
 	if (g_SettingsMan.BlipOnRevealUnseen()) {
 		// Highlight the pixels that have been revealed on the unseen maps

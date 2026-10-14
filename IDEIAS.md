@@ -44,7 +44,9 @@ Então as ideias abaixo são **lacunas em relação aos jogos atuais**, não uma
 
 Legenda de esforço: 🟢 semanas · 🟡 1 a 3 meses · 🔴 vários meses
 
-### 1.1 Terreno vivo: líquidos, gases e fogo · 🟡 **fogo implementado** (branch `feature/terreno-vivo`), líquidos e gases pendentes · referência: **Noita**, **Teardown**, **Sandustry**
+### 1.1 Terreno vivo: líquidos, gases e fogo · ✅ **implementado**: fogo (branch `feature/terreno-vivo`), líquidos e gases (branch `feature/liquidos-gases`) · referência: **Noita**, **Teardown**, **Sandustry**
+
+> **Feito:** água, óleo, ácido, gás tóxico e vapor escorrendo pixel a pixel (`TerrainFluids`). Líquidos caem, escorrem por bordas e nivelam em poças, com "pressão" para não formarem montes como areia; os mais leves boiam nos mais pesados; gases sobem e se dissipam. Ficam numa camada própria, translúcida, por cima do terreno, então **não bloqueiam ninguém**: quem está dentro sofre arrasto e empuxo (dá para afundar, boiar ou andar com água pela cintura). Água apaga fogo e vira vapor; óleo pega fogo, queima e espalha o incêndio; ácido corrói o terreno (mais rápido nos materiais moles) e fere quem pisa nele; gás tóxico fere quem respira. Só os pixels com fluido são simulados, e poças paradas "dormem", então cena sem fluido não custa nada; uma enchente de 20 mil pixels roda a ~56 FPS. Conteúdo: 4 granadas no Arsenal (Hydro Grenade, Acid Flask, Napalm Canister, Toxin Grenade) e o script global "Flooded Caves" (cavernas com poças de água e óleo). API Lua `SceneMan:AddFluid/RemoveFluids/GetFluidAt/GetFluidPixelCount`. **Não feito:** a IA ainda não desvia de ácido e gás; fluidos não entram nos saves; não há `State` por material no INI (os fluidos são tipos fixos no motor).
 
 **O que é:** cada pixel do terreno passa a ter um *estado*: sólido, pó, líquido ou gás. Líquidos escorrem e fazem poças, gases sobem, fogo se espalha por materiais inflamáveis, ácido corrói, óleo pega fogo, água apaga fogo.
 

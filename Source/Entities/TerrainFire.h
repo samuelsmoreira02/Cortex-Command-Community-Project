@@ -10,6 +10,7 @@
 namespace RTE {
 
 	class SLTerrain;
+	class TerrainFluids;
 
 	/// Fire that spreads through flammable terrain. Pixels of materials with a Flammability above 0 can catch fire from burning neighbours,
 	/// burn for their material's BurnTime, then turn into their BurnsInto material (air by default, burning them away).
@@ -36,9 +37,10 @@ namespace RTE {
 		/// @return How many pixels were put out.
 		int Extinguish(const Vector& pos, float radius);
 
-		/// Spreads fire, burns out pixels and spawns flames. Call every simulation update.
+		/// Spreads fire, burns out pixels and spawns flames. Fire next to water is put out, boiling the water into steam, and fire next to oil sets it alight. Call every simulation update.
 		/// @param terrain The terrain that's burning. Ownership is NOT transferred!
-		void Update(SLTerrain* terrain);
+		/// @param fluids The fluids flowing through the terrain.
+		void Update(SLTerrain* terrain, TerrainFluids& fluids);
 
 		/// Gets how many terrain pixels are on fire.
 		/// @return The number of burning pixels.
