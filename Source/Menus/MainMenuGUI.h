@@ -82,6 +82,7 @@ namespace RTE {
 			EditorsButton,
 			CreditsButton,
 			QuitButton,
+			ContinueButton,
 			ResumeButton,
 			BackToMainButton,
 			PlayTutorialButton,
@@ -107,6 +108,7 @@ namespace RTE {
 		MainMenuUpdateResult m_UpdateResult; //!< The result of the MainMenuGUI update. See MainMenuUpdateResult enumeration.
 		bool m_MenuScreenChange; //!< Whether the active menu screen was changed and a different one needs to be shown.
 		bool m_MetaGameNoticeShown; //!< Whether the MetaGame notice and tutorial offer have been shown to the player.
+		std::string m_LatestSaveGameName; //!< The saved game the continue button loads, or empty if there's none.
 
 		Timer m_ResumeButtonBlinkTimer; //!< Activity resume button blink timer.
 		Timer m_CreditsScrollTimer; //!< Credits scrolling timer.
@@ -172,6 +174,13 @@ namespace RTE {
 
 		/// Makes the resume game button visible to be interacted with by the player if a game is in progress and animates it (blinking).
 		void ShowAndBlinkResumeButton();
+
+		/// Shows the continue button if there's a saved game to continue, and stacks the main screen's visible buttons from the top, so a hidden button doesn't leave a gap.
+		void ArrangeMainScreenButtons();
+
+		/// Gets the name of the most recently written saved game, like a quick save or an autosave.
+		/// @return The name of the saved game, without its extension, or an empty string if there are none.
+		static std::string GetLatestSaveGameName();
 
 		/// Progresses the credits scrolling.
 		/// @return Whether the credits finished scrolling.

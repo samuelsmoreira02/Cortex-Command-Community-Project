@@ -63,6 +63,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - New global script "Loot Drops". Enemies your team kills drop loot colored by rarity, picked up by walking over it: gold (common, white), medkits (uncommon, green), 15-second power-ups (rare, cyan: Overdrive for faster fire and reloads, Adrenaline for rapid healing and steady footing, Rocket Fuel for an endless jetpack, Bottomless Mag for no reloading) and, now and then, a legendary Arsenal weapon (gold) marked with a beam of light.
 
+- New "Continue" button at the top of the main menu, which loads the most recently written saved game, like the last quick save or autosave, and jumps straight back into it. It only shows when there's a saved game to continue.
+
 - New global script "Colorblind Team Markers". Marks every unit with a symbol above its head that shows its team by shape as well as color: a blue circle, an orange square, a yellow triangle or a light blue diamond. The colors stay distinguishable with red-green and blue-yellow colorblindness.
 
 - New global script "Photo Mode". Press F8 to hide the HUD, slow the game to a near stop, freeze the unit you control and fly the camera around with the arrow keys or WASD (hold Shift to go faster). Take pictures with F12. Press F8 again to go back to the game.

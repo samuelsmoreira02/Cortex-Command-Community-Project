@@ -3,6 +3,7 @@
 #include "WindowMan.h"
 #include "FrameMan.h"
 #include "ActivityMan.h"
+#include "PresetMan.h"
 #include "UInputMan.h"
 #include "SettingsMan.h"
 #include "ConsoleMan.h"
@@ -19,6 +20,11 @@
 #include "Resources/Credits.h"
 
 using namespace RTE;
+
+namespace {
+	/// The vertical distance between the main screen's buttons, in pixels.
+	constexpr int c_MainScreenButtonSpacing = 20;
+} // namespace
 
 void MainMenuGUI::Clear() {
 	m_RootBoxMaxWidth = 0;
@@ -98,6 +104,7 @@ void MainMenuGUI::CreateMainScreen() {
 	m_MainMenuButtons[MenuButton::EditorsButton] = dynamic_cast<GUIButton*>(m_MainMenuScreenGUIControlManager->GetControl("ButtonMainToEditor"));
 	m_MainMenuButtons[MenuButton::CreditsButton] = dynamic_cast<GUIButton*>(m_MainMenuScreenGUIControlManager->GetControl("ButtonMainToCreds"));
 	m_MainMenuButtons[MenuButton::QuitButton] = dynamic_cast<GUIButton*>(m_MainMenuScreenGUIControlManager->GetControl("ButtonQuit"));
+	m_MainMenuButtons[MenuButton::ContinueButton] = dynamic_cast<GUIButton*>(m_MainMenuScreenGUIControlManager->GetControl("ButtonContinueLastGame"));
 	m_MainMenuButtons[MenuButton::ResumeButton] = dynamic_cast<GUIButton*>(m_MainMenuScreenGUIControlManager->GetControl("ButtonResume"));
 
 	for (int mainScreenButton = MenuButton::MetaGameButton; mainScreenButton <= MenuButton::ResumeButton; ++mainScreenButton) {
@@ -197,13 +204,46 @@ void MainMenuGUI::SetActiveMenuScreen(MenuScreen screenToShow, bool playButtonPr
 void MainMenuGUI::ShowMainScreen() {
 	m_VersionLabel->SetVisible(true);
 
-	m_MainMenuScreens[MenuScreen::MainScreen]->Resize(300, 196);
 	m_MainMenuScreens[MenuScreen::MainScreen]->SetVisible(true);
 
 	m_MainMenuButtons[MenuButton::BackToMainButton]->SetVisible(false);
 	m_MainMenuButtons[MenuButton::ResumeButton]->SetVisible(false);
+	ArrangeMainScreenButtons();
 
 	m_MenuScreenChange = false;
+}
+
+std::string MainMenuGUI::GetLatestSaveGameName() {
+	std::string latestSaveGameName;
+	std::filesystem::file_time_type latestWriteTime;
+	std::error_code errorCode;
+	for (const std::filesystem::directory_entry& entry: std::filesystem::directory_iterator(g_PresetMan.GetFullModulePath(c_UserScriptedSavesModuleName), errorCode)) {
+		if (entry.is_regular_file() && entry.path().extension() == ".ccsave") {
+			std::filesystem::file_time_type writeTime = entry.last_write_time(errorCode);
+			if (!errorCode && (latestSaveGameName.empty() || writeTime > latestWriteTime)) {
+				latestSaveGameName = entry.path().stem().string();
+				latestWriteTime = writeTime;
+			}
+		}
+	}
+	return latestSaveGameName;
+}
+
+void MainMenuGUI::ArrangeMainScreenButtons() {
+	m_LatestSaveGameName = GetLatestSaveGameName();
+	m_MainMenuButtons[MenuButton::ContinueButton]->SetVisible(!m_LatestSaveGameName.empty());
+
+	int buttonY = 0;
+	for (MenuButton button: {MenuButton::ContinueButton, MenuButton::MetaGameButton, MenuButton::ScenarioButton, MenuButton::SaveOrLoadGameButton, MenuButton::SettingsButton, MenuButton::ModManagerButton, MenuButton::EditorsButton, MenuButton::CreditsButton, MenuButton::QuitButton, MenuButton::ResumeButton}) {
+		// The resume button keeps its place even while hidden, so it can appear without the screen resizing under the cursor.
+		if (button != MenuButton::ResumeButton && !m_MainMenuButtons[button]->GetVisible()) {
+			continue;
+		}
+		m_MainMenuButtons[button]->SetPositionRel(m_MainMenuButtons[button]->GetRelXPos(), buttonY);
+		buttonY += c_MainScreenButtonSpacing;
+	}
+	// Room below the last button, and more of it while the resume button is showing, as before the continue button was added.
+	m_MainMenuScreens[MenuScreen::MainScreen]->Resize(300, buttonY + (m_MainMenuButtons[MenuButton::ResumeButton]->GetVisible() ? 40 : 16));
 }
 
 void MainMenuGUI::ShowMetaGameNoticeScreen() {
@@ -268,8 +308,8 @@ void MainMenuGUI::ShowAndBlinkResumeButton() {
 	if (!m_MainMenuButtons[MenuButton::ResumeButton]->GetVisible()) {
 		m_ResumeButtonBlinkTimer.Reset();
 		if (g_ActivityMan.GetActivity() && (g_ActivityMan.GetActivity()->GetActivityState() == Activity::Running || g_ActivityMan.GetActivity()->GetActivityState() == Activity::Editing)) {
-			m_MainMenuScreens[MenuScreen::MainScreen]->Resize(300, 220);
 			m_MainMenuButtons[MenuButton::ResumeButton]->SetVisible(true);
+			ArrangeMainScreenButtons();
 		}
 	} else {
 		if (m_MainScreenHoveredButton && m_MainScreenHoveredButton == m_MainMenuButtons[MenuButton::ResumeButton]) {
@@ -438,6 +478,14 @@ void MainMenuGUI::HandleMainScreenInputEvents(const GUIControl* guiEventControl)
 	} else if (guiEventControl == m_MainMenuButtons[MenuButton::ResumeButton]) {
 		m_UpdateResult = MainMenuUpdateResult::ActivityResumed;
 		g_GUISound.BackButtonPressSound()->Play();
+	} else if (guiEventControl == m_MainMenuButtons[MenuButton::ContinueButton]) {
+		// Loading a saved game starts its activity straight away, so all that's left is to go back to it.
+		if (!m_LatestSaveGameName.empty() && g_ActivityMan.LoadAndLaunchGame(m_LatestSaveGameName)) {
+			m_UpdateResult = MainMenuUpdateResult::ActivityResumed;
+			g_GUISound.ConfirmSound()->Play();
+		} else {
+			g_GUISound.UserErrorSound()->Play();
+		}
 	}
 }
 
